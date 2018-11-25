@@ -3,9 +3,7 @@ import numpy
 
 
 class MapData():
-    """
-    Holds data about grid based maps.
-    """
+    """Handles data about grid based maps."""
 
     json_file = 'maps.json'
 
@@ -15,18 +13,16 @@ class MapData():
 
     @classmethod
     def save_map_data(cls, input_ndarray, map_name, output_file):
+        """Saves numpy arrays in an easy-to-edit format to json file."""
         map_data_strings = []
         for row in range(len(input_ndarray)):
             row_as_string = ''.join(input_ndarray[row])
             map_data_strings.append(row_as_string)
 
         json_entry = {map_name: map_data_strings}
-        # for l in map_data_strings:
-        # print(l)
 
         with open(output_file) as f:
             json_data = json.load(f)
-            # print(json_data)
 
         json_data.update(json_entry)
 
@@ -34,10 +30,10 @@ class MapData():
             json.dump(json_data, f)
 
     def load_map_from_json(self, map_name):
+        """Loads a map layout from json file and converts it to numpy two dimensional array."""
         with open(MapData.json_file) as f:
             json_data = json.load(f)
 
-        # print(json_data[map_name][0])
         height = len(json_data[map_name])
         width = len(json_data[map_name][0])
         map = numpy.empty((height, width), dtype=str)
