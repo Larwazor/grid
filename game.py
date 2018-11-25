@@ -25,12 +25,14 @@ class Grid():
         self.draw_map()
 
     def draw_map(self):
+        global screen
 
         width = self.cell_size * self.width
         height = self.cell_size * self.height
         create_window(width, height)
-        # set_sdl()
+
         create_screen(width, height)
+        # set_sdl()
 
         for y in range(self.height):
             for x in range(self.width):
@@ -56,15 +58,26 @@ def create_window(window_width, window_height):
     global root
     global embed
 
-    # window_height = 1024
-    # window_width = 1024
+    # SET WINDOW POS ON SCREEN
+
+    if embed == None:
+        root.geometry(f'{window_width}x{window_height}+300+100')
+        # screen_width = root.winfo_screenwidth()
+        # screen_height = root.winfo_screenheight()
+        # x = (screen_width/2) - (window_width/2)
+        # y = (screen_height/2) - (window_height/2)
+        # root.geometry('%dx%d+%d+%d' % (window_width, window_height, x, y))
 
     root.minsize(window_width, window_height)
     root.maxsize(window_width, window_height)
-    print(f'{window_width} x {window_height}')
-    # embed = tk.Frame(root, width=window_width*2, height=window_height*2) # works
+
     embed = tk.Frame(root, width=window_width, height=window_height)
-    embed.pack(side=tk.LEFT)
+
+    # side=tk.TOP, fill=tk.BOTH, expand=1
+    embed.pack(ipadx=window_width, ipady=window_height)
+
+    #print(f'{window_width} x {window_height}')
+    # print(embed.pack_info())
 
 
 def create_menu_bar():
