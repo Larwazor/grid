@@ -29,7 +29,7 @@ class Grid():
         width = self.cell_size * self.width
         height = self.cell_size * self.height
         create_window(width, height)
-        set_sdl()
+        # set_sdl()
         create_screen(width, height)
 
         for y in range(self.height):
@@ -40,44 +40,15 @@ class Grid():
                     160, 160, 160)
                 pygame.draw.rect(screen, cell_color, rect)
 
-        # resize_window(width, height)
-
-        # pygame.display.update()
-
-
-def resize_window(window_width, window_height):
-    global embed
-    global root
-
-    embed = tk.Frame(root, width=window_width, height=window_height)
-    embed.pack(side=tk.LEFT)
-
-    root.minsize(window_width, window_height)
-    root.maxsize(window_width, window_height)
-    root.update()
-    # print('test: ', embed.winfo_width(), embed.winfo_height())
-    # embed.pack_propagate(0)
-    # print(f'{embed.width} * {embed.height}')
-    # embed.width = width
-    # embed.height = height
-    # print(f'{embed} * {embed}')
-
-    # embed.grid(columnspan=width, rowspan=height)
-    # embed.pack(side=tk.TOP)
-    # embed.pack_propagate(0)
-
 
 def draw_circle():
     # Test function.
     pygame.draw.circle(screen, (127, 63, 191), (250, 250), 125)
-    pygame.display.update()
 
 
 def draw_grid(map_name, cell_size):
     # Function to create a test grid.
     grid = Grid(map_name, cell_size)
-    # print(grid.map.data)
-    # print(f'{grid.height} x {grid.width}')
 
 
 def create_window(window_width, window_height):
@@ -85,17 +56,15 @@ def create_window(window_width, window_height):
     global root
     global embed
 
-    if root == None:
-        root = tk.Tk()
+    # window_height = 1024
+    # window_width = 1024
 
     root.minsize(window_width, window_height)
     root.maxsize(window_width, window_height)
+    print(f'{window_width} x {window_height}')
+    # embed = tk.Frame(root, width=window_width*2, height=window_height*2) # works
     embed = tk.Frame(root, width=window_width, height=window_height)
-    # embed = tk.Frame(root, width=(2*window_width), height=(2*window_height)) miksi tämä toimii?
-
-    #embed.grid(columnspan=(window_width), rowspan=window_height)
     embed.pack(side=tk.LEFT)
-    #print('test: ', embed.winfo_width(), embed.winfo_height())
 
 
 def create_menu_bar():
@@ -129,11 +98,10 @@ def create_screen(screen_width, screen_height):
     screen = pygame.display.set_mode((screen_width, screen_width))
     screen.fill(pygame.Color(31, 31, 31))
     pygame.display.init()
-    pygame.display.update()
-    print(screen)
 
 
 # Initialize
+root = tk.Tk()
 create_window(app_width, app_height)
 create_menu_bar()
 set_sdl()
@@ -143,8 +111,17 @@ create_screen(app_width, app_height)
 # Create cursor to replace the awkward default one.
 cursor.create_cursor()
 
-# Mainloop.
-#root.resizable(False, False)
-root.update()
+
+def game_loop():
+    # Pygame Mainloop
+    global root
+    # print('game_loop')
+    pygame.display.update()
+    root.after(16, game_loop)
+
+
+# Mainloop
+root.resizable(False, False)
 root.config(menu=menu_bar)
+game_loop()
 root.mainloop()
