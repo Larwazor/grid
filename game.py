@@ -18,7 +18,6 @@ class Grid():
         self.draw_map()
 
     def draw_map(self):
-
         for y in range(self.height):
             for x in range(self.width):
                 rect = pygame.Rect(
