@@ -30,15 +30,14 @@ class Grid():
         pygame.display.update()
 
 
-# Test function.
 def draw_circle():
+    # Test function.
     pygame.draw.circle(screen, (127, 63, 191), (250, 250), 125)
     pygame.display.update()
 
-# Function to create a test grid.
-
 
 def draw_grid(map_name):
+    # Function to create a test grid.
     grid = Grid(map_name, 32)
     print(grid.map.data)
     print(f'{grid.height} x {grid.width}')
