@@ -4,6 +4,7 @@ import os
 import cursor
 import numpy
 import maps
+from character import Character
 
 app_width = 512
 app_height = 512
@@ -11,28 +12,31 @@ root = None
 screen = None
 embed = None
 menu_bar = None
+current_grid = None
 
 
 class Grid():
     """Handles drawing grid based maps."""
 
     def __init__(self, map_name, cell_size):
+        global current_grid
         self.map_name = map_name
         self.cell_size = cell_size
         self.map = maps.MapData(map_name)
         self.height = len(self.map.data)
         self.width = len(self.map.data[0])
+        self.set_current_grid()
         self.draw_map()
+        self.character_list = []
 
     def draw_map(self):
+        """Draws map based on letters in json map data file."""
         global screen
 
         width = self.cell_size * self.width
         height = self.cell_size * self.height
         create_window(width, height)
-
         create_screen(width, height)
-        # set_sdl()
 
         for y in range(self.height):
             for x in range(self.width):
@@ -41,6 +45,17 @@ class Grid():
                 cell_color = (70, 70, 70) if self.map.data[y][x] == '.' else (
                     160, 160, 160)
                 pygame.draw.rect(screen, cell_color, rect)
+
+    def set_current_grid(self):
+        """Set self as current grid and clear old one's character list."""
+        global current_grid
+        try:
+            for char in current_grid.character_list:
+                print('del', char)
+                del char
+        except Exception:
+            pass
+        current_grid = self
 
 
 def draw_circle():
@@ -53,31 +68,27 @@ def draw_grid(map_name, cell_size):
     grid = Grid(map_name, cell_size)
 
 
+def add_character():
+    global current_grid
+    global character_list
+    char = Character('wizard.png', (1, 1), current_grid)
+
+
 def create_window(window_width, window_height):
     """Create tkinter embed for Pygame window."""
     global root
     global embed
 
-    # SET WINDOW POS ON SCREEN
-
+    # Set window pos on screen on start
     if embed == None:
         root.geometry(f'{window_width}x{window_height}+300+100')
-        # screen_width = root.winfo_screenwidth()
-        # screen_height = root.winfo_screenheight()
-        # x = (screen_width/2) - (window_width/2)
-        # y = (screen_height/2) - (window_height/2)
-        # root.geometry('%dx%d+%d+%d' % (window_width, window_height, x, y))
 
     root.minsize(window_width, window_height)
     root.maxsize(window_width, window_height)
 
     embed = tk.Frame(root, width=window_width, height=window_height)
 
-    # side=tk.TOP, fill=tk.BOTH, expand=1
     embed.pack(ipadx=window_width, ipady=window_height)
-
-    #print(f'{window_width} x {window_height}')
-    # print(embed.pack_info())
 
 
 def create_menu_bar():
@@ -93,6 +104,8 @@ def create_menu_bar():
         label="Create Map2", command=lambda: draw_grid('map2', 32))
     options_menu.add_command(
         label="Create Map3", command=lambda: draw_grid('map3', 64))
+    options_menu.add_command(
+        label="Add Character", command=add_character)
     options_menu.add_separator()
     options_menu.add_command(label="Exit", command=root.quit)
     menu_bar.add_cascade(label="Options", menu=options_menu)
@@ -126,9 +139,15 @@ cursor.create_cursor()
 
 
 def game_loop():
+    global character_list
     # Pygame Mainloop
     global root
     # print('game_loop')
+    try:
+        for char in current_grid.character_list:
+            char.draw(screen)
+    except Exception:
+        pass
     pygame.display.update()
     root.after(16, game_loop)
 
