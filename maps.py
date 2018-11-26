@@ -9,7 +9,8 @@ class MapData():
 
     def __init__(self, map_to_load):
 
-        self.data = self.load_map_from_json(map_to_load)
+        self.map_name = map_to_load
+        self.data = self.load_map_from_json()
 
     @classmethod
     def save_map_data(cls, input_ndarray, map_name, output_file):
@@ -29,23 +30,23 @@ class MapData():
         with open(output_file, 'w') as f:
             json.dump(json_data, f)
 
-    def load_map_from_json(self, map_name):
+    def load_map_from_json(self):
         """Loads a map layout from json file and converts it to numpy two dimensional array."""
         with open(MapData.json_file) as f:
             json_data = json.load(f)
 
-        height = len(json_data[map_name])
-        width = len(json_data[map_name][0])
+        height = len(json_data[self.map_name])
+        width = len(json_data[self.map_name][0])
         map = numpy.empty((height, width), dtype=str)
 
         for y in range(height):
             for x in range(width):
-                map[y][x] = json_data[map_name][y][x]
+                map[y][x] = json_data[self.map_name][y][x]
 
         return map
 
 
-loaded_map1 = MapData('map1')
+#loaded_map1 = MapData('map1')
 
 # map1 = numpy.empty((16, 16), dtype=str)
 # print(f'{len(map1)} x {len(map1[0])}')
