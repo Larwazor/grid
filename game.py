@@ -61,12 +61,25 @@ class Grid():
         current_grid = self
 
     def contains_position(self, pos):
-        """Test if position is in the grid"""
-        if pos[0] > 0 and pos[1] > 0 and pos[0] < self.width and pos[1] < self.height:
+        """Test if position is on the grid"""
+        if pos[0] >= 0 and pos[1] >= 0 and pos[0] < self.width and pos[1] < self.height:
             #print('contains pos', pos)
             return True
         else:
             #print('does not contain pos', pos)
+            return False
+
+    def get_pos(self, pos):
+        if self.contains_position(pos):
+            return self.map.data[pos[1]][pos[0]]
+        else:
+            return None
+
+    def can_move_to_position(self, pos):
+        pos_on_grid = self.get_pos(pos)
+        if pos_on_grid == '.':
+            return True
+        else:
             return False
 
 
@@ -78,12 +91,13 @@ def draw_circle():
 def draw_grid(map_name, cell_size):
     # Function to create a test grid.
     grid = Grid(map_name, cell_size)
+    add_character()
 
 
 def add_character():
     global current_grid
     global character_list
-    char = Character('wizard.png', (1, 1), current_grid)
+    char = Character('wizard.png', (5, 1), current_grid)
 
 
 def create_window(window_width, window_height):
@@ -116,8 +130,6 @@ def create_menu_bar():
         label="Create Map2", command=lambda: draw_grid('map2', 32))
     options_menu.add_command(
         label="Create Map3", command=lambda: draw_grid('map3', 64))
-    options_menu.add_command(
-        label="Add Character", command=add_character)
     options_menu.add_separator()
     options_menu.add_command(label="Exit", command=root.quit)
     menu_bar.add_cascade(label="Options", menu=options_menu)

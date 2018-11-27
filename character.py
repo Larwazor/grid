@@ -24,7 +24,8 @@ class Character():
             self.image, (self.pos[0] * self.grid.cell_size, self.pos[1] * self.grid.cell_size))
 
     def move(self, direction):
-        desired_pos = self.pos
+        desired_pos = self.pos.copy()
+
         if direction == 'e':
             desired_pos[0] += 1
         elif direction == 'w':
@@ -34,7 +35,5 @@ class Character():
         elif direction == 's':
             desired_pos[1] += 1
 
-        if self.grid.contains_position(desired_pos):
+        if self.grid.can_move_to_position(desired_pos):
             self.pos = desired_pos
-        print(self.grid.contains_position(desired_pos))
-        # print(self.pos)
