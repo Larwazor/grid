@@ -63,13 +63,12 @@ class Grid():
     def contains_position(self, pos):
         """Test if position is on the grid"""
         if pos[0] >= 0 and pos[1] >= 0 and pos[0] < self.width and pos[1] < self.height:
-            #print('contains pos', pos)
             return True
         else:
-            #print('does not contain pos', pos)
             return False
 
     def get_pos(self, pos):
+        """Return info about position('X', '.' or None)"""
         if self.contains_position(pos):
             return self.map.data[pos[1]][pos[0]]
         else:
@@ -105,7 +104,7 @@ def create_window(window_width, window_height):
     global root
     global embed
 
-    # Set window pos on screen on start
+    # Set window pos on start
     if embed == None:
         root.geometry(f'{window_width}x{window_height}+300+100')
 
@@ -165,39 +164,32 @@ cursor.create_cursor()
 def get_kb_input():
     kb_input = pygame.key.get_pressed()
     if kb_input[pygame.K_a]:
-        current_grid.character_list[0].move('w')
+        current_grid.character_list[0].set_direction('w')
     elif kb_input[pygame.K_d]:
-        current_grid.character_list[0].move('e')
+        current_grid.character_list[0].set_direction('e')
     elif kb_input[pygame.K_w]:
-        current_grid.character_list[0].move('n')
+        current_grid.character_list[0].set_direction('n')
     elif kb_input[pygame.K_s]:
-        current_grid.character_list[0].move('s')
-
-
-# clock = pygame.time.Clock()
-# while True:
-#     clock.tick(60)
-#     # get_kb_input()
-#     print('run')
+        current_grid.character_list[0].set_direction('s')
 
 
 def game_loop():
     global character_list
-    # Pygame Mainloop
     global root
-    # print('game_loop')
+    update_interval = 16
     try:
         current_grid.draw()
         for char in current_grid.character_list:
+            char.move(update_interval)
             char.draw(screen)
     except Exception:
         pass
     get_kb_input()
     pygame.display.update()
-    root.after(16, game_loop)
+    root.after(update_interval, game_loop)
 
 
-# Mainloop
+# Tkinter Mainloop
 root.resizable(False, False)
 root.config(menu=menu_bar)
 game_loop()
