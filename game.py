@@ -6,8 +6,8 @@ import numpy
 import maps
 from character import Character
 
-app_width = 512
-app_height = 512
+app_width = 512  # Start width
+app_height = 512  # Start height
 root = None
 screen = None
 embed = None
@@ -38,6 +38,9 @@ class Grid():
         create_window(width, height)
         create_screen(width, height)
 
+        self.draw()
+
+    def draw(self):
         for y in range(self.height):
             for x in range(self.width):
                 rect = pygame.Rect(
@@ -56,6 +59,15 @@ class Grid():
         except Exception:
             pass
         current_grid = self
+
+    def contains_position(self, pos):
+        """Test if position is in the grid"""
+        if pos[0] > 0 and pos[1] > 0 and pos[0] < self.width and pos[1] < self.height:
+            #print('contains pos', pos)
+            return True
+        else:
+            #print('does not contain pos', pos)
+            return False
 
 
 def draw_circle():
@@ -138,16 +150,37 @@ create_screen(app_width, app_height)
 cursor.create_cursor()
 
 
+def get_kb_input():
+    kb_input = pygame.key.get_pressed()
+    if kb_input[pygame.K_a]:
+        current_grid.character_list[0].move('w')
+    elif kb_input[pygame.K_d]:
+        current_grid.character_list[0].move('e')
+    elif kb_input[pygame.K_w]:
+        current_grid.character_list[0].move('n')
+    elif kb_input[pygame.K_s]:
+        current_grid.character_list[0].move('s')
+
+
+# clock = pygame.time.Clock()
+# while True:
+#     clock.tick(60)
+#     # get_kb_input()
+#     print('run')
+
+
 def game_loop():
     global character_list
     # Pygame Mainloop
     global root
     # print('game_loop')
     try:
+        current_grid.draw()
         for char in current_grid.character_list:
             char.draw(screen)
     except Exception:
         pass
+    get_kb_input()
     pygame.display.update()
     root.after(16, game_loop)
 

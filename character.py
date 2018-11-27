@@ -6,7 +6,7 @@ class Character():
 
     def __init__(self, image, start_pos, grid):
         self.image = pygame.image.load('images/' + image)
-        self.pos = start_pos
+        self.pos = list(start_pos)
         self.grid = grid
         self.scale_image()
         self.character_list = grid.character_list
@@ -22,3 +22,19 @@ class Character():
     def draw(self, screen):
         screen.blit(
             self.image, (self.pos[0] * self.grid.cell_size, self.pos[1] * self.grid.cell_size))
+
+    def move(self, direction):
+        desired_pos = self.pos
+        if direction == 'e':
+            desired_pos[0] += 1
+        elif direction == 'w':
+            desired_pos[0] -= 1
+        elif direction == 'n':
+            desired_pos[1] -= 1
+        elif direction == 's':
+            desired_pos[1] += 1
+
+        if self.grid.contains_position(desired_pos):
+            self.pos = desired_pos
+        print(self.grid.contains_position(desired_pos))
+        # print(self.pos)
