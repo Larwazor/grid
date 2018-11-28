@@ -17,6 +17,7 @@ class Character():
         self.init_drawing()
         self.move_speed = 5.0
         self.is_moving = False
+        self.move_sequence = []
 
     def init_drawing(self):
         self.draw_pos = [float(i) for i in self.pos]
@@ -35,7 +36,7 @@ class Character():
     def move(self, update_interval):
         """Moves drawing position based on move speed and screen update interval"""
         self.is_moving = True
-        approx_tolerance = 0.1  # Tolerance to be considered being close to target
+        approx_tolerance = 0.05  # Tolerance to be considered being close to target
         total_movespd = (self.move_speed * update_interval) / 1000
 
         # If not vertically at target, move towards target
@@ -52,16 +53,42 @@ class Character():
                 self.draw_pos[1] -= total_movespd
         # Set position to be exactly target and set bool to enable setting new target
         else:
-            self.set_pos()
             self.is_moving = False
+            self.set_pos()
+
+            if len(self.move_sequence) > 0:
+                # print('move_seq')
+                self.move_to_next_in_seq()
+
+    def move_to_next_in_seq(self):
+        """
+        Moves from position to next in a sequence.
+        """
+        target = self.move_sequence[0]
+        self.pop_first_in_sequence()
+
+        if target[0] > self.pos[0]:
+            self.move_to_direction('e')
+        elif target[0] < self.pos[0]:
+            self.move_to_direction('w')
+        elif target[1] > self.pos[1]:
+            self.move_to_direction('s')
+        elif target[1] < self.pos[1]:
+            self.move_to_direction('n')
 
     def set_pos(self):
         """Sets position and draw position to target position"""
         self.pos = self.target_pos.copy()
         self.draw_pos = self.target_pos.copy()
 
-    def set_direction(self, direction):
-        """Set movement direction based on kb input"""
+    def set_sequence(self, sequence):
+        self.move_sequence = sequence
+
+    def pop_first_in_sequence(self):
+        self.move_sequence = self.move_sequence[1:]
+
+    def move_to_direction(self, direction):
+        """Set movement direction"""
         desired_pos = self.pos.copy()
 
         if self.is_moving:
