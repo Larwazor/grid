@@ -90,12 +90,19 @@ class Character():
         """Remove first item from movement sequence"""
         self.move_sequence = self.move_sequence[1:]
 
-    def move_to_direction(self, direction):
+    def clear_move_sequence(self):
+        if len(self.move_sequence) > 0:
+            self.move_sequence = []
+
+    def move_to_direction(self, direction, clear_sequence=False):
         """Set movement direction"""
         desired_pos = self.pos.copy()
 
         if self.is_moving:
             return
+
+        if clear_sequence:
+            self.clear_move_sequence()
 
         if direction == 'e':
             desired_pos[0] += 1

@@ -163,27 +163,37 @@ cursor.create_cursor()
 
 def get_kb_input():
     kb_input = pygame.key.get_pressed()
-    if kb_input[pygame.K_a]:
-        current_grid.character_list[0].move_to_direction('w')
-    elif kb_input[pygame.K_d]:
-        current_grid.character_list[0].move_to_direction('e')
-    elif kb_input[pygame.K_w]:
-        current_grid.character_list[0].move_to_direction('n')
-    elif kb_input[pygame.K_s]:
-        current_grid.character_list[0].move_to_direction('s')
-    elif kb_input[pygame.K_g]:
-        current_grid.character_list[0].set_sequence(
-            ((2, 1), (3, 1), (4, 1), (4, 2), (5, 2), (5, 3), (6, 3), (7, 3)))
-    elif kb_input[pygame.K_j]:
-        print(current_grid.character_list[0].pos)
+    try:
+        if kb_input[pygame.K_a]:
+            current_grid.character_list[0].move_to_direction(
+                'w', clear_sequence=True)
+        elif kb_input[pygame.K_d]:
+            current_grid.character_list[0].move_to_direction(
+                'e', clear_sequence=True)
+        elif kb_input[pygame.K_w]:
+            current_grid.character_list[0].move_to_direction(
+                'n', clear_sequence=True)
+        elif kb_input[pygame.K_s]:
+            current_grid.character_list[0].move_to_direction(
+                's', clear_sequence=True)
+        elif kb_input[pygame.K_g]:
+            current_grid.character_list[0].set_sequence(
+                ((2, 1), (3, 1), (4, 1), (4, 2), (5, 2), (5, 3), (6, 3), (7, 3)))
+        elif kb_input[pygame.K_j]:
+            print(current_grid.character_list[0].pos)
+    except AttributeError:
+        pass
 
 
 def get_mouse_input():
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONUP:
-            mouse_pos = (pygame.mouse.get_pos()[
-                0] // current_grid.cell_size, pygame.mouse.get_pos()[1] // current_grid.cell_size)
-            flash_pos(mouse_pos)
+            try:
+                mouse_pos = (pygame.mouse.get_pos()[
+                    0] // current_grid.cell_size, pygame.mouse.get_pos()[1] // current_grid.cell_size)
+                flash_pos(mouse_pos)
+            except AttributeError:
+                pass
 
 
 def flash_pos(pos):
