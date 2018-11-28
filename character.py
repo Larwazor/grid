@@ -50,7 +50,7 @@ class Character():
                 self.draw_pos[1] += total_movespd
             else:
                 self.draw_pos[1] -= total_movespd
-        # Set position to be exactly target and set bool to avoid setting new target
+        # Set position to be exactly target and set bool to enable setting new target
         else:
             self.set_pos()
             self.is_moving = False
