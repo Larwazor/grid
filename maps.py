@@ -46,8 +46,7 @@ class MapData():
         return map
 
 
-#loaded_map1 = MapData('map3')
-
+# Snippet for setting up a new map and adding it to json
 
 # map1 = numpy.empty((16, 16), dtype=str)
 # print(f'{len(map1)} x {len(map1[0])}')

@@ -20,6 +20,7 @@ class Character():
         self.move_sequence = []
 
     def init_drawing(self):
+        """Keep character's actual position and drawing position separate, making latter float"""
         self.draw_pos = [float(i) for i in self.pos]
 
     def scale_image(self):
@@ -82,9 +83,11 @@ class Character():
         self.draw_pos = self.target_pos.copy()
 
     def set_sequence(self, sequence):
+        """Set new movement sequence"""
         self.move_sequence = sequence
 
     def pop_first_in_sequence(self):
+        """Remove first item from movement sequence"""
         self.move_sequence = self.move_sequence[1:]
 
     def move_to_direction(self, direction):

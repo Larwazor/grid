@@ -54,7 +54,6 @@ class Grid():
         global current_grid
         try:
             for char in current_grid.character_list:
-                print('del', char)
                 del char
         except Exception:
             pass
@@ -75,6 +74,7 @@ class Grid():
             return None
 
     def can_move_to_position(self, pos):
+        """Test if position is walkable, a '.'"""
         pos_on_grid = self.get_pos(pos)
         if pos_on_grid == '.':
             return True
@@ -83,12 +83,12 @@ class Grid():
 
 
 def draw_circle():
-    # Test function.
+    """Test function."""
     pygame.draw.circle(screen, (127, 63, 191), (250, 250), 125)
 
 
 def draw_grid(map_name, cell_size):
-    # Function to create a test grid.
+    """Function to create a test grid."""
     grid = Grid(map_name, cell_size)
     add_character()
 
@@ -117,7 +117,7 @@ def create_window(window_width, window_height):
 
 
 def create_menu_bar():
-    # Create menu bar.
+    """Create menu bar."""
     global root
     global menu_bar
     menu_bar = tk.Menu(root)
@@ -136,7 +136,7 @@ def create_menu_bar():
 
 def set_sdl():
     global embed
-    # Mysterious OS settings, latter seems obsolete nowadays.
+    """Mysterious OS settings, latter seems obsolete nowadays."""
     os.environ['SDL_WINDOWID'] = str(embed.winfo_id())
     os.environ['SDL_VIDEODRIVER'] = 'windib'
 
