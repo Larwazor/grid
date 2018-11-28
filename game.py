@@ -93,6 +93,15 @@ def draw_grid(map_name, cell_size):
     add_character()
 
 
+def mark_positions(pos_list):
+    """Mark list specified positions with a red circle"""
+    for pos in pos_list:
+        x_pos = pos[0]*current_grid.cell_size + current_grid.cell_size // 2
+        y_pos = pos[1] * current_grid.cell_size + current_grid.cell_size // 2
+        size = current_grid.cell_size // 8
+        pygame.draw.circle(screen, (255, 0, 0, 100), (x_pos, y_pos), size)
+
+
 def add_character():
     global current_grid
     global character_list
@@ -215,8 +224,10 @@ def game_loop():
         for char in current_grid.character_list:
             char.move(update_interval)
             char.draw(screen)
+            mark_positions(char.move_sequence)
     except Exception:
         pass
+
     get_kb_input()
     get_mouse_input()
     pygame.display.update()
