@@ -5,12 +5,12 @@ import math
 class Character():
     """Basic game character"""
 
-    def __init__(self, image, start_pos, grid):
+    def __init__(self, image, start_pos, map):
         self.image = pygame.image.load('images/' + image)
         self.pos = list(start_pos)
-        self.grid = grid
+        self.map = map
         self.scale_image()
-        self.character_list = grid.character_list
+        self.character_list = map.character_list
         self.character_list.append(self)
         self.target_pos = self.pos
         self.draw_pos = None
@@ -24,15 +24,15 @@ class Character():
         self.draw_pos = [float(i) for i in self.pos]
 
     def scale_image(self):
-        """Scale image if grid's cell size differs from it"""
+        """Scale image if map's cell size differs from it"""
         original_size = self.image.get_rect().size
-        if original_size[0] != self.grid.cell_size or original_size[1] != self.grid.cell_size:
+        if original_size[0] != self.map.cell_size or original_size[1] != self.map.cell_size:
             self.image = pygame.transform.scale(
-                self.image, (self.grid.cell_size, self.grid.cell_size))
+                self.image, (self.map.cell_size, self.map.cell_size))
 
     def draw(self, screen):
         screen.blit(
-            self.image, (self.draw_pos[0] * self.grid.cell_size, self.draw_pos[1] * self.grid.cell_size))
+            self.image, (self.draw_pos[0] * self.map.cell_size, self.draw_pos[1] * self.map.cell_size))
 
     def move(self, update_interval):
         """Moves drawing position based on move speed and screen update interval"""
@@ -113,5 +113,8 @@ class Character():
         elif direction == 's':
             desired_pos[1] += 1
 
-        if self.grid.can_move_to_position(desired_pos):
+        if self.map.can_move_to_position(desired_pos):
             self.target_pos = desired_pos
+
+    def find_path_to(self, position):
+        print(self.map.map.data[position[1]][position[0]])

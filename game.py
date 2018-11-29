@@ -5,6 +5,7 @@ import cursor
 import numpy
 import maps
 from character import Character
+from pathfind import Grid
 
 app_width = 512  # Start width
 app_height = 512  # Start height
@@ -28,6 +29,7 @@ class Map():
         self.set_current_map()
         self.draw_map()
         self.character_list = []
+        self.pathfind_grid = self.get_pathfind_grid()
 
     def draw_map(self):
         """Draws map based on letters in json map data file."""
@@ -80,6 +82,20 @@ class Map():
             return True
         else:
             return False
+
+    def get_pathfind_grid(self):
+        """
+        Return a pathfind Grid with map data turned into booleans
+        """
+        grid_data = []
+        for y in range(len(self.map.data)):
+            grid_data.append([])
+            for x in range(len(self.map.data[0])):
+                if self.get_pos((x, y)) == '.':
+                    grid_data[y].append(True)
+                else:
+                    grid_data[y].append(False)
+        return Grid(grid_data)
 
 
 def draw_circle():
@@ -214,6 +230,7 @@ def get_mouse_input():
                     mouse_pos = (pygame.mouse.get_pos()[
                         0] // current_map.cell_size, pygame.mouse.get_pos()[1] // current_map.cell_size)
                     flash_pos(mouse_pos)
+                    current_map.character_list[0].find_path_to(mouse_pos)
                 except AttributeError:
                     pass
 
