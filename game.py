@@ -194,15 +194,28 @@ def get_kb_input():
         pass
 
 
+def mouse_on_window():
+
+    mouse_x = root.winfo_pointerx() - root.winfo_rootx()
+    mouse_y = root.winfo_pointery() - root.winfo_rooty()
+
+    if mouse_x >= 0 and mouse_y >= 0:
+        if mouse_x <= root.winfo_width() and mouse_y <= root.winfo_height():
+            return True
+    return False
+
+
 def get_mouse_input():
-    for event in pygame.event.get():
-        if event.type == pygame.MOUSEBUTTONUP:
-            try:
-                mouse_pos = (pygame.mouse.get_pos()[
-                    0] // current_grid.cell_size, pygame.mouse.get_pos()[1] // current_grid.cell_size)
-                flash_pos(mouse_pos)
-            except AttributeError:
-                pass
+    if mouse_on_window():
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONUP:
+                try:
+                    mouse_pos = (pygame.mouse.get_pos()[
+                        0] // current_grid.cell_size, pygame.mouse.get_pos()[1] // current_grid.cell_size)
+                    flash_pos(mouse_pos)
+                    print('click')
+                except AttributeError:
+                    pass
 
 
 def flash_pos(pos):
