@@ -54,12 +54,40 @@ class Grid():
 
     def find_path(self, start, end):
         if start == end:
-            #print('Destination reached')
+            # print('Destination reached')
             return
 
         if not self.map_data[end[0]][end[1]]:
-            #print('Destination not walkable')
+            # print('Destination not walkable')
             return
+
+    def contains_position(self, pos):
+        """Test if position is on the map"""
+        width = len(self.map_data)
+        height = len(self.map_data[0])
+        if pos[0] >= 0 and pos[1] >= 0 and pos[0] < width and pos[1] < height:
+            return True
+        else:
+            return False
+
+    def get_walkable_adjacent_nodes(self, node):
+        """Return walkable adjacent nodes in horizontal or vertical direction"""
+        nodes = []
+        for i in range(-1, 2, 2):
+
+            x = node[0]
+            y = node[1] + i
+            if self.contains_position([x, y]) and self.map_data[x][y]:
+                node_to_add = Node([x, y])
+                nodes.append(node_to_add)
+
+            x = node[0] + i
+            y = node[1]
+            if self.contains_position([x, y]) and self.map_data[x][y]:
+                node_to_add = Node([x, y])
+                nodes.append(node_to_add)
+
+        return nodes
 
 
 test_node = Node((1, 1))
@@ -76,23 +104,31 @@ test_grid = Grid(test_data)
 #    print(line)
 # print(test_node)
 # print(test_node.isEqual(test_node2))
-#test_grid.find_path([1, 1], [0, 0])
+# test_grid.find_path([1, 1], [0, 0])
+
+# print(test_grid.get_walkable_adjacent_nodes([1, 1]))
+
+for line in test_grid.map_data:
+    print(line)
+
+for node in test_grid.get_walkable_adjacent_nodes([1, 1]):
+    print(node)
 
 
-test_grid.open_list = test_nodes
-for n in test_grid.open_list:
-    print(n)
-print('-----------------------')
-test_grid.insert_in_open_list(test_node)
-for n in test_grid.open_list:
-    print(n)
-print('-----------------------')
-test_grid.insert_in_open_list(test_node2)
-for n in test_grid.open_list:
-    print(n)
-print('-----------------------')
-test_grid.insert_in_open_list(test_node3)
-for n in test_grid.open_list:
-    print(n)
-print('-----------------------')
-print(test_grid.compute_h_score_from_to(test_node, test_node3))
+# test_grid.open_list = test_nodes
+# for n in test_grid.open_list:
+#     print(n)
+# print('-----------------------')
+# test_grid.insert_in_open_list(test_node)
+# for n in test_grid.open_list:
+#     print(n)
+# print('-----------------------')
+# test_grid.insert_in_open_list(test_node2)
+# for n in test_grid.open_list:
+#     print(n)
+# print('-----------------------')
+# test_grid.insert_in_open_list(test_node3)
+# for n in test_grid.open_list:
+#     print(n)
+# print('-----------------------')
+# print(test_grid.compute_h_score_from_to(test_node, test_node3))
