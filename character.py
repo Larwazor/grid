@@ -116,5 +116,6 @@ class Character():
         if self.map.can_move_to_position(desired_pos):
             self.target_pos = desired_pos
 
-    def find_path_to(self, position):
-        print(self.map.map.data[position[1]][position[0]])
+    def find_path_to(self, destination):
+        self.set_sequence(self.map.find_path(self.pos, destination))
+        #print('sequence: ', self.move_sequence)

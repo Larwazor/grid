@@ -93,17 +93,21 @@ class Map():
 
     def get_pathfind_grid(self):
         """
-        Return a pathfind Grid with map data turned into booleans
+        Return a pathfind Grid with map data turned into booleans(1 or 0)
         """
         grid_data = []
         for y in range(len(self.data)):
             grid_data.append([])
             for x in range(len(self.data[0])):
                 if self.get_pos((x, y)) == '.':
-                    grid_data[y].append(True)
+                    grid_data[y].append(1)
                 else:
-                    grid_data[y].append(False)
+                    grid_data[y].append(0)
         return Grid(grid_data)
+
+    def find_path(self, start, end):
+        """Find path from pathfinding grid"""
+        self.pathfind_grid.find_path(start, end)
 
 
 # Snippet for setting up a new map and adding it to json
