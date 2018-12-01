@@ -3,9 +3,8 @@ import tkinter as tk
 import os
 import cursor
 import numpy
-import maps
+from maps import Map
 from character import Character
-from pathfind import Grid
 
 app_width = 512  # Start width
 app_height = 512  # Start height
@@ -16,96 +15,30 @@ menu_bar = None
 current_map = None
 
 
-class Map():
-    """Handles drawing map and interfaces the map data."""
+def set_current_map(new_map):
+    """Set new map as current after clearing old one's character list."""
+    global current_map
+    try:
+        for char in current_map.character_list:
+            del char
+    except Exception:
+        pass
 
-    def __init__(self, map_name, cell_size):
-        global current_map
-        self.map_name = map_name
-        self.cell_size = cell_size
-        self.map = maps.MapData(map_name)
-        self.height = len(self.map.data)
-        self.width = len(self.map.data[0])
-        self.set_current_map()
-        self.draw_map()
-        self.character_list = []
-        self.pathfind_grid = self.get_pathfind_grid()
-
-    def draw_map(self):
-        """Draws map based on letters in json map data file."""
-        global screen
-
-        width = self.cell_size * self.width
-        height = self.cell_size * self.height
-        create_window(width, height)
-        create_screen(width, height)
-
-        self.draw()
-
-    def draw(self):
-        for y in range(self.height):
-            for x in range(self.width):
-                rect = pygame.Rect(
-                    x*self.cell_size, y*self.cell_size, self.cell_size, self.cell_size)
-                cell_color = (70, 70, 70) if self.map.data[y][x] == '.' else (
-                    160, 160, 160)
-                pygame.draw.rect(screen, cell_color, rect)
-
-    def set_current_map(self):
-        """Set self as current map and clear old one's character list."""
-        global current_map
-        try:
-            for char in current_map.character_list:
-                del char
-        except Exception:
-            pass
-        current_map = self
-
-    def contains_position(self, pos):
-        """Test if position is on the map"""
-        if pos[0] >= 0 and pos[1] >= 0 and pos[0] < self.width and pos[1] < self.height:
-            return True
-        else:
-            return False
-
-    def get_pos(self, pos):
-        """Return info about position('X', '.' or None)"""
-        if self.contains_position(pos):
-            return self.map.data[pos[1]][pos[0]]
-        else:
-            return None
-
-    def can_move_to_position(self, pos):
-        """Test if position is walkable, a '.'"""
-        pos_on_map = self.get_pos(pos)
-        if pos_on_map == '.':
-            return True
-        else:
-            return False
-
-    def get_pathfind_grid(self):
-        """
-        Return a pathfind Grid with map data turned into booleans
-        """
-        grid_data = []
-        for y in range(len(self.map.data)):
-            grid_data.append([])
-            for x in range(len(self.map.data[0])):
-                if self.get_pos((x, y)) == '.':
-                    grid_data[y].append(True)
-                else:
-                    grid_data[y].append(False)
-        return Grid(grid_data)
+    current_map = new_map
 
 
-def draw_circle():
-    """Test function."""
-    pygame.draw.circle(screen, (127, 63, 191), (250, 250), 125)
+def init_map(map_name, cell_size):
+    """Initialize map
 
-
-def draw_map(map_name, cell_size):
-    """Function to create a test map."""
+    Creates Map object, embed, game window, sets references and globals and adds character.
+    """
+    global screen
     map = Map(map_name, cell_size)
+    map_size = map.get_size()
+    create_window(map_size)
+    create_screen(map_size)
+    map.set_screen(screen)
+    set_current_map(map)
     add_character()
 
 
@@ -124,10 +57,13 @@ def add_character():
     char = Character('wizard.png', (1, 1), current_map)
 
 
-def create_window(window_width, window_height):
+def create_window(window_size):
     """Create tkinter embed for Pygame window."""
     global root
     global embed
+
+    window_width = window_size[0]
+    window_height = window_size[1]
 
     # Set window pos on start
     if embed == None:
@@ -147,13 +83,12 @@ def create_menu_bar():
     global menu_bar
     menu_bar = tk.Menu(root)
     options_menu = tk.Menu(menu_bar, tearoff=0)
-    options_menu.add_command(label="Draw Circle", command=draw_circle)
     options_menu.add_command(
-        label="Create Map1, Cell size: 16x16", command=lambda: draw_map('map1', 16))
+        label="Create Map1, Cell size: 16x16", command=lambda: init_map('map1', 16))
     options_menu.add_command(
-        label="Create Map2, Cell size: 32x32", command=lambda: draw_map('map2', 32))
+        label="Create Map2, Cell size: 32x32", command=lambda: init_map('map2', 32))
     options_menu.add_command(
-        label="Create Map3, Cell size: 64x64", command=lambda: draw_map('map3', 64))
+        label="Create Map3, Cell size: 64x64", command=lambda: init_map('map3', 64))
     options_menu.add_separator()
     options_menu.add_command(label="Exit", command=root.quit)
     menu_bar.add_cascade(label="Options", menu=options_menu)
@@ -166,19 +101,19 @@ def set_sdl():
     os.environ['SDL_VIDEODRIVER'] = 'windib'
 
 
-def create_screen(screen_width, screen_height):
+def create_screen(screen_size):
     """Create Pygame screen."""
     global screen
-    screen = pygame.display.set_mode((screen_width, screen_height))
+    screen = pygame.display.set_mode((screen_size[0], screen_size[1]))
     screen.fill(pygame.Color(31, 31, 31))
 
 
 # Initialize
 root = tk.Tk()
-create_window(app_width, app_height)
+create_window((app_width, app_height))
 create_menu_bar()
 set_sdl()
-create_screen(app_width, app_height)
+create_screen((app_width, app_height))
 
 
 # Create cursor to replace the awkward default one.
@@ -215,8 +150,6 @@ def mouse_on_window():
     mouse_y = root.winfo_pointery() - root.winfo_rooty()
     if mouse_x >= 0 and mouse_y >= 0:
         if mouse_x <= root.winfo_width() and mouse_y <= root.winfo_height():
-            # pygame.event.post(pygame.event.Event(
-            #    6, {'pos': (230, 122), 'button': 1}))
             return True
     return False
 
@@ -225,7 +158,6 @@ def get_mouse_input():
     if mouse_on_window():
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                # print(event)
                 try:
                     mouse_pos = (pygame.mouse.get_pos()[
                         0] // current_map.cell_size, pygame.mouse.get_pos()[1] // current_map.cell_size)
@@ -248,6 +180,7 @@ def flash_pos(pos):
 def game_loop():
     global character_list
     global root
+    global current_map
     update_interval = 16
     try:
         current_map.draw()

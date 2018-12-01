@@ -77,6 +77,8 @@ test_grid = Grid(test_data)
 # print(test_node)
 # print(test_node.isEqual(test_node2))
 #test_grid.find_path([1, 1], [0, 0])
+
+
 test_grid.open_list = test_nodes
 for n in test_grid.open_list:
     print(n)
