@@ -23,14 +23,14 @@ class Node():
     def get_f_score(self):
         return self.g_score + self.h_score
 
-    def compute_h_score_to(self, to_node):
+    def compute_h_score_to_node(self, to_node):
         """Compute distance from node to node with Manhattan method"""
         return abs(to_node.position[0] - self.position[0]) + abs(to_node.position[1] - self.position[1])
 
 
 class Grid():
     """
-    Represents a grid based map of booleans for pathfinding.
+    Represents a grid based map of integers for pathfinding.
     """
 
     def __init__(self, map_data):
@@ -39,6 +39,7 @@ class Grid():
         self.map_data = map_data
 
     def compute_move_cost(self, from_node, to_node):
+        """Return move cost from node to another, always 1 for now"""
         return 1
 
     def clear_lists(self):
@@ -58,8 +59,9 @@ class Grid():
         return self.map_data[node.position[1]][node.position[0]]
 
     def get_walkable_adjacent_nodes(self, node, diagonals=False):
-        """Return walkable adjacent nodes in horizontal or vertical direction"""
+        """Return walkable adjacent nodes"""
         nodes = []
+
         for i in range(-1, 2, 2):
 
             x = node.position[0]
@@ -74,6 +76,12 @@ class Grid():
                 node_to_add = Node((x, y))
                 nodes.append(node_to_add)
 
+            if diagonals:
+                for y in range(-1, 2, 2):
+                    pos = ((node.position[0] + i, node.position[1] + y))
+                    if self.contains_position(pos) and self.map_data[pos[1]][pos[0]]:
+                        nodes.append(Node(pos))
+
         return nodes
 
     def get_lowest_f_score(self):
@@ -82,67 +90,84 @@ class Grid():
 
     def find_closest_walkable_nearby(self, from_node, to_node):
         """Find the most convenient walkable node"""
+
         adj_nodes = self.get_walkable_adjacent_nodes(to_node)
+
+        # Try to find a non diagonal nearby node
         try:
-            return min(adj_nodes, key=methodcaller('compute_h_score_to', from_node))
+            node_to_return = min(adj_nodes, key=methodcaller(
+                'compute_h_score_to_node', from_node))
+        # Try to find diagonal nearby node
         except ValueError:
-            return
+            try:
+                adj_nodes = self.get_walkable_adjacent_nodes(
+                    to_node, diagonals=True)
+                node_to_return = min(adj_nodes, key=methodcaller(
+                    'compute_h_score_to_node', from_node))
+            except ValueError:
+                return
+        return node_to_return
 
     def find_path(self, start_pos, end_pos):
         """Find path from starting coordinates to end coordinates"""
+        self.clear_lists()
 
         start_node = Node(tuple(start_pos))
         end_node = Node(tuple(end_pos))
 
+        # Try to find a walkable node nearby in case arg is not
         if not self.node_walkable(end_node):
-            print('node not walkable')
             end_node = self.find_closest_walkable_nearby(start_node, end_node)
             if not end_node:
                 return
 
         self.open_list.append(start_node)
 
+        # End loop if there are no more nodes to go through
         while len(self.open_list) > 0:
 
+            # From open list move node with lowest f_score to closed list
             current_node = self.get_lowest_f_score()
             self.open_list.remove(current_node)
             self.closed_list.append(current_node)
 
+            # Found path
             if current_node == end_node:
-                # Found path
                 path = []
 
+                # Gather nodes from end to start
                 while current_node:
                     path.append(current_node)
                     current_node = current_node.parent
 
-                self.clear_lists()
-                # for line in list(reversed(path))[1:]:
-                #     print(line.position)
+                # Return all but start
                 return [i.position for i in list(reversed(path))][1:]
 
             adj_nodes = self.get_walkable_adjacent_nodes(current_node)
 
+            # All adjacent walkable nodes
             for adj_node in adj_nodes:
+
+                # Skip if already gone through
                 if adj_node in self.closed_list:
                     continue
 
                 move_cost = self.compute_move_cost(current_node, adj_node)
 
-                if not adj_node in self.open_list:
+                # Remove from open list if current route is faster, otherwise skip
+                if adj_node in self.open_list:
+                    if current_node.g_score + move_cost >= adj_node.g_score:
+                        continue
+                    self.open_list.remove(adj_node)
 
-                    adj_node.parent = current_node
-                    adj_node.g_score = current_node.g_score + move_cost
-                    adj_node.h_score = adj_node.compute_h_score_to(end_node)
-                    self.open_list.append(adj_node)
-                else:
-                    if current_node.g_score + move_cost < adj_node.g_score:
-                        self.open_list.remove(adj_node)
-                        adj_node.parent = current_node
-                        adj_node.g_score = current_node.g_score + move_cost
-                        adj_node.h_score = adj_node.compute_h_score_to(
-                            end_node)
-                        self.open_list.append(adj_node)
+                adj_node.parent = current_node
+                adj_node.g_score = current_node.g_score + move_cost
+                adj_node.h_score = adj_node.compute_h_score_to_node(
+                    end_node)
+                self.open_list.append(adj_node)
+
+        # Found no path
+        return
 
 
 # test_node = Node((1, 1))
@@ -159,6 +184,10 @@ class Grid():
 # for line in test_grid.map_data:
 #     print(line)
 # print()
+
+# diags = test_grid.get_walkable_adjacent_nodes(Node((1, 3)), diagonals=True)
+# for diag in diags:
+#     print(diag)
 
 # test_grid.open_list.append(Node((2, 1)))
 # test_grid.find_path((1, 1), (3, 3))

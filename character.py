@@ -58,7 +58,6 @@ class Character():
             self.set_pos()
 
             if len(self.move_sequence) > 0:
-                # print('move_seq')
                 self.move_to_next_in_seq()
 
     def move_to_next_in_seq(self):
@@ -84,7 +83,6 @@ class Character():
 
     def set_sequence(self, sequence):
         """Set new movement sequence"""
-        print(sequence)
         self.move_sequence = sequence
 
     def pop_first_in_sequence(self):
