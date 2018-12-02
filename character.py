@@ -65,6 +65,7 @@ class Character():
         Moves from position to next in a sequence.
         """
         target = self.move_sequence[0]
+
         self.pop_first_in_sequence()
 
         if target[0] > self.pos[0]:
