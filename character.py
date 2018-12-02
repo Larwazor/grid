@@ -84,6 +84,7 @@ class Character():
 
     def set_sequence(self, sequence):
         """Set new movement sequence"""
+        # print(sequence)
         self.move_sequence = sequence
 
     def pop_first_in_sequence(self):
@@ -117,5 +118,6 @@ class Character():
             self.target_pos = desired_pos
 
     def find_path_to(self, destination):
-        self.set_sequence(self.map.find_path(self.pos, destination))
-        #print('sequence: ', self.move_sequence)
+        path = self.map.find_path(self.pos, destination)
+        if path and len(path) > 0:
+            self.set_sequence(path)

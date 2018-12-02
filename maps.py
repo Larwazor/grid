@@ -107,7 +107,7 @@ class Map():
 
     def find_path(self, start, end):
         """Find path from pathfinding grid"""
-        self.pathfind_grid.find_path(start, end)
+        return self.pathfind_grid.find_path(start, end)
 
 
 # Snippet for setting up a new map and adding it to json
