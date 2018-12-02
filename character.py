@@ -84,7 +84,7 @@ class Character():
 
     def set_sequence(self, sequence):
         """Set new movement sequence"""
-        # print(sequence)
+        print(sequence)
         self.move_sequence = sequence
 
     def pop_first_in_sequence(self):

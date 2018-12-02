@@ -23,6 +23,10 @@ class Node():
     def get_f_score(self):
         return self.g_score + self.h_score
 
+    def compute_h_score_to(self, to_node):
+        """Compute distance from node to node with Manhattan method"""
+        return abs(to_node.position[0] - self.position[0]) + abs(to_node.position[1] - self.position[1])
+
 
 class Grid():
     """
@@ -33,10 +37,6 @@ class Grid():
         self.open_list = []
         self.closed_list = []
         self.map_data = map_data
-
-    def compute_h_score_from_to(self, from_node, to_node):
-        """Compute distance from node to node with Manhattan method"""
-        return abs(to_node.position[0] - from_node.position[0]) + abs(to_node.position[1] - from_node.position[1])
 
     def compute_move_cost(self, from_node, to_node):
         return 1
@@ -54,7 +54,10 @@ class Grid():
         else:
             return False
 
-    def get_walkable_adjacent_nodes(self, node):
+    def node_walkable(self, node):
+        return self.map_data[node.position[1]][node.position[0]]
+
+    def get_walkable_adjacent_nodes(self, node, diagonals=False):
         """Return walkable adjacent nodes in horizontal or vertical direction"""
         nodes = []
         for i in range(-1, 2, 2):
@@ -77,11 +80,25 @@ class Grid():
         """Get node with lowest f score in open list"""
         return min(self.open_list, key=methodcaller('get_f_score'))
 
+    def find_closest_walkable_nearby(self, from_node, to_node):
+        """Find the most convenient walkable node"""
+        adj_nodes = self.get_walkable_adjacent_nodes(to_node)
+        try:
+            return min(adj_nodes, key=methodcaller('compute_h_score_to', from_node))
+        except ValueError:
+            return
+
     def find_path(self, start_pos, end_pos):
         """Find path from starting coordinates to end coordinates"""
 
         start_node = Node(tuple(start_pos))
         end_node = Node(tuple(end_pos))
+
+        if not self.node_walkable(end_node):
+            print('node not walkable')
+            end_node = self.find_closest_walkable_nearby(start_node, end_node)
+            if not end_node:
+                return
 
         self.open_list.append(start_node)
 
@@ -94,16 +111,15 @@ class Grid():
             if current_node == end_node:
                 # Found path
                 path = []
-                path.append(current_node)
 
-                while current_node.parent:
-                    path.append(current_node.parent)
+                while current_node:
+                    path.append(current_node)
                     current_node = current_node.parent
 
                 self.clear_lists()
-                for line in list(reversed(path)):
-                    print(line.position)
-                return list(reversed(path))
+                # for line in list(reversed(path))[1:]:
+                #     print(line.position)
+                return [i.position for i in list(reversed(path))][1:]
 
             adj_nodes = self.get_walkable_adjacent_nodes(current_node)
 
@@ -117,16 +133,15 @@ class Grid():
 
                     adj_node.parent = current_node
                     adj_node.g_score = current_node.g_score + move_cost
-                    adj_node.h_score = self.compute_h_score_from_to(
-                        adj_node, end_node)
+                    adj_node.h_score = adj_node.compute_h_score_to(end_node)
                     self.open_list.append(adj_node)
                 else:
                     if current_node.g_score + move_cost < adj_node.g_score:
                         self.open_list.remove(adj_node)
                         adj_node.parent = current_node
                         adj_node.g_score = current_node.g_score + move_cost
-                        adj_node.h_score = self.compute_h_score_from_to(
-                            adj_node, end_node)
+                        adj_node.h_score = adj_node.compute_h_score_to(
+                            end_node)
                         self.open_list.append(adj_node)
 
 
