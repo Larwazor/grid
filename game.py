@@ -13,6 +13,7 @@ screen = None
 embed = None
 menu_bar = None
 current_map = None
+update_interval = 16  # How often(in ms) is screen refreshed
 
 
 def set_current_map(new_map):
@@ -54,7 +55,8 @@ def mark_positions(pos_list):
 def add_character():
     global current_map
     global character_list
-    char = Character('wizard.png', (1, 1), current_map)
+    global screen
+    char = Character('wizard.png', (5, 1), current_map, screen)
 
 
 def create_window(window_size):
@@ -181,12 +183,11 @@ def game_loop():
     global character_list
     global root
     global current_map
-    update_interval = 16
+    global update_interval
     try:
         current_map.draw()
         for char in current_map.character_list:
             char.move(update_interval)
-            char.draw(screen)
             mark_positions(char.move_sequence)
     except Exception:
         pass

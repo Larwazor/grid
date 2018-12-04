@@ -140,8 +140,8 @@ class Grid():
                     path.append(current_node)
                     current_node = current_node.parent
 
-                # Return list of positions from start to end
-                return [i.position for i in list(reversed(path))]
+                # Return list of position lists from end to start
+                return [list(i.position) for i in path]
 
             adj_nodes = self.get_walkable_adjacent_nodes(current_node)
 

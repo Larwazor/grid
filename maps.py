@@ -84,7 +84,7 @@ class Map():
         else:
             return None
 
-    def can_move_to_position(self, pos):
+    def position_walkable(self, pos):
         """Test if position is walkable, a '.'"""
         if self.get_pos(pos) == '.':
             return True
