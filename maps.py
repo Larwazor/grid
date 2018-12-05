@@ -9,7 +9,7 @@ class Map():
 
     json_file = 'maps.json'
 
-    def __init__(self, map_to_load, cell_size):
+    def __init__(self, map_to_load, cell_size, diagonal_movement=False):
 
         self.map_name = map_to_load
         self.data = self.load_map_from_json()
@@ -17,6 +17,7 @@ class Map():
         self.height = len(self.data)
         self.width = len(self.data[0])
         self.character_list = []
+        self.diagonal_movement = diagonal_movement
         self.pathfind_grid = self.get_pathfind_grid()
         self.screen = None
 
@@ -103,7 +104,7 @@ class Map():
                     grid_data[y].append(1)
                 else:
                     grid_data[y].append(0)
-        return Grid(grid_data)
+        return Grid(grid_data, diagonal_movement=self.diagonal_movement)
 
     def find_path(self, start, end):
         """Find path from pathfinding grid"""

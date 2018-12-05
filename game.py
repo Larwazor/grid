@@ -28,13 +28,13 @@ def set_current_map(new_map):
     current_map = new_map
 
 
-def init_map(map_name, cell_size):
+def init_map(map_name, cell_size, diagonal_move=False):
     """Initialize map
 
     Creates Map object, embed, game window, sets references and globals and adds character.
     """
     global screen
-    map = Map(map_name, cell_size)
+    map = Map(map_name, cell_size, diagonal_movement=diagonal_move)
     map_size = map.get_size()
     create_window(map_size)
     create_screen(map_size)
@@ -88,7 +88,7 @@ def create_menu_bar():
     options_menu.add_command(
         label="Create Map1, Cell size: 16x16", command=lambda: init_map('map1', 16))
     options_menu.add_command(
-        label="Create Map2, Cell size: 32x32", command=lambda: init_map('map2', 32))
+        label="Create Map2, Cell size: 32x32", command=lambda: init_map('map2', 32, diagonal_move=True))
     options_menu.add_command(
         label="Create Map3, Cell size: 64x64", command=lambda: init_map('map3', 64))
     options_menu.add_separator()

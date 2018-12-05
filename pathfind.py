@@ -29,18 +29,25 @@ class Node():
 
 
 class Grid():
-    """
-    Represents a grid based map of integers for pathfinding.
-    """
+    """Represents a grid based map of integers for pathfinding."""
 
-    def __init__(self, map_data):
+    def __init__(self, map_data, diagonal_movement=False):
         self.open_list = []
         self.closed_list = []
         self.map_data = map_data
+        self.diagonal_movement = diagonal_movement
 
     def compute_move_cost(self, from_node, to_node):
-        """Return move cost from node to another, always 1 for now"""
-        return 1
+        """Return move cost from node to another
+
+            Diagonal movement costs approx 1.4 times more than non-diagonal. Multiply by 10 to get integers
+        """
+        abs_distance = abs(to_node.position[0] - from_node.position[0]) + \
+            abs(to_node.position[1] - from_node.position[1])
+        if abs_distance <= 1:
+            return 10
+        else:
+            return 14
 
     def clear_lists(self):
         self.open_list = []
@@ -143,7 +150,8 @@ class Grid():
                 # Return list of position lists from end to start
                 return [list(i.position) for i in path]
 
-            adj_nodes = self.get_walkable_adjacent_nodes(current_node)
+            adj_nodes = self.get_walkable_adjacent_nodes(
+                current_node, diagonals=self.diagonal_movement)
 
             # All adjacent walkable nodes
             for adj_node in adj_nodes:
