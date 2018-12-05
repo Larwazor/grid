@@ -17,7 +17,7 @@ class Character():
         self.screen = screen
         self.target_pos = []  # Next position to move to
         self.move_dir = []  # Direction of movement
-        self.queued_destination = None  # Queued destination from click
+        self.queued_destination = []  # Queued destination from click
 
     def scale_image(self):
         """Scale image if map's cell size differs from it"""
@@ -29,6 +29,12 @@ class Character():
     def draw(self):
         self.screen.blit(
             self.image, (self.draw_pos[0] * self.map.cell_size, self.draw_pos[1] * self.map.cell_size))
+
+    def set_target_and_dir(self):
+        """Get last item in move sequence and calculate direction"""
+        self.target_pos = self.move_sequence[-1]
+        self.move_dir = (self.target_pos[0] - self.pos[0],
+                         self.target_pos[1] - self.pos[1])
 
     def move(self, update_interval):
         """Calculates drawing position and moves actual position after"""
@@ -42,18 +48,17 @@ class Character():
             if self.queued_destination:
                 self.find_path()
 
-            # Get last item in move sequence and calculate direction
-            self.target_pos = self.move_sequence[-1]
-            self.move_dir = (self.target_pos[0] - self.pos[0],
-                             self.target_pos[1] - self.pos[1])
+            # Get new target
+            self.set_target_and_dir()
 
         total_movespd = (self.move_speed * update_interval) / 1000
         approx_tolerance = 0.05  # Tolerance to be considered being close to target
 
-        # If we are close enough to target position, round positions to integers and clear target
+        # If we are close enough to target position, round positions to integers, clear target and pop
         if math.isclose(self.draw_pos[0], self.target_pos[0], abs_tol=approx_tolerance) and math.isclose(self.draw_pos[1], self.target_pos[1], abs_tol=approx_tolerance):
             self.pos[0] = self.draw_pos[0] = int(self.target_pos[0])
             self.pos[1] = self.draw_pos[1] = int(self.target_pos[1])
+            self.move_sequence.pop()
             self.target_pos = []
         else:  # Move in the required direction
             self.draw_pos[0] += self.move_dir[0] * total_movespd
@@ -61,7 +66,6 @@ class Character():
 
     def find_path_to(self, destination):
         """Queues up a path find to destination"""
-
         self.queued_destination = destination
 
     def find_path(self):
@@ -69,7 +73,7 @@ class Character():
         path = self.map.find_path(self.pos, self.queued_destination)
         if path:
             self.move_sequence = path[:-1]
-            # self.queued_destination = [] ???????????????????????????????????????
+            self.queued_destination = []
 
     def move_to_direction(self, direction, clear_sequence=False):
         """Set movement direction
@@ -88,5 +92,7 @@ class Character():
         elif direction == 's':
             desired_pos[1] += 1
 
-        if self.map.position_walkable(desired_pos):
-            self.target_pos = desired_pos
+        # If we can move to direction and aren't currently walking
+        if self.map.position_walkable(desired_pos) and not self.target_pos:
+            self.move_sequence = [desired_pos]
+            self.set_target_and_dir()
