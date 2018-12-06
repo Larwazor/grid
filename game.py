@@ -88,7 +88,7 @@ def create_menu_bar():
     options_menu.add_command(
         label="Create Map1, Cell size: 16x16", command=lambda: init_map('map1', 16))
     options_menu.add_command(
-        label="Create Map2, Cell size: 32x32", command=lambda: init_map('map2', 32, diagonal_move=True))
+        label="Create Map2, Cell size: 32x32, diagonal movement allowed", command=lambda: init_map('map2', 32, diagonal_move=True))
     options_menu.add_command(
         label="Create Map3, Cell size: 64x64", command=lambda: init_map('map3', 64))
     options_menu.add_separator()

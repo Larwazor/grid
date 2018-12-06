@@ -51,8 +51,13 @@ class Character():
             # Get new target
             self.set_target_and_dir()
 
-        total_movespd = (self.move_speed * update_interval) / 1000
         approx_tolerance = 0.05  # Tolerance to be considered being close to target
+
+        # Slow down movement by dividing if moving diagonally
+        divider = 1.4 if abs(
+            self.move_dir[0]) + abs(self.move_dir[1]) == 2 else 1
+
+        total_movespd = (self.move_speed * update_interval) / 1000 / divider
 
         # If we are close enough to target position, round positions to integers, clear target and pop
         if math.isclose(self.draw_pos[0], self.target_pos[0], abs_tol=approx_tolerance) and math.isclose(self.draw_pos[1], self.target_pos[1], abs_tol=approx_tolerance):
