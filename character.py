@@ -56,8 +56,12 @@ class Character():
         # Slow down movement by dividing if moving diagonally
         divider = 1.4 if abs(
             self.move_dir[0]) + abs(self.move_dir[1]) == 2 else 1
+        # Get movement cost from target tile
+        terrain_speed = self.map.data[
+            self.target_pos[1]][self.target_pos[0]].movement_cost
 
-        total_movespd = (self.move_speed * update_interval) / 1000 / divider
+        total_movespd = (self.move_speed * update_interval) / \
+            100 / (divider * terrain_speed)
 
         # If we are close enough to target position, round positions to integers, clear target and pop
         if math.isclose(self.draw_pos[0], self.target_pos[0], abs_tol=approx_tolerance) and math.isclose(self.draw_pos[1], self.target_pos[1], abs_tol=approx_tolerance):

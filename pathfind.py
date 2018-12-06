@@ -40,14 +40,16 @@ class Grid():
     def compute_move_cost(self, from_node, to_node):
         """Return move cost from node to another
 
-            Diagonal movement costs approx 1.4 times more than non-diagonal. Multiply by 10 to get integers
+            Factor in movement cost of terrain and whether moving diagonally or not.
         """
         abs_distance = abs(to_node.position[0] - from_node.position[0]) + \
             abs(to_node.position[1] - from_node.position[1])
-        if abs_distance <= 1:
-            return 10
-        else:
-            return 14
+
+        cost = self.map_data[to_node.position[1]][to_node.position[0]]
+
+        total = int((1.4 if abs_distance == 2 else 1) * cost)
+
+        return total
 
     def clear_lists(self):
         self.open_list = []
