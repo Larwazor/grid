@@ -12,16 +12,16 @@ class Tile():
         self.movement_cost = None
         self.color = None
 
-        if identifier == 'X':
+        if identifier == 'X':  # Wall
             self.movement_cost = 0
             self.color = (160, 160, 160)
-        elif identifier == '.':
+        elif identifier == '.':  # Floor
             self.movement_cost = 10
             self.color = (70, 70, 70)
-        elif identifier == 'o':
+        elif identifier == 'o':  # Sand
             self.movement_cost = 30
             self.color = (90, 80, 50)
-        elif identifier == 'w':
+        elif identifier == 'w':  # Water
             self.movement_cost = 60
             self.color = (0, 90, 120)
 
@@ -100,7 +100,7 @@ class Map():
             return False
 
     def get_pos(self, pos):
-        """Return info about position('X', '.' or None)"""
+        """Return tile at position"""
         if self.contains_position(pos):
             return self.data[pos[1]][pos[0]]
         else:
@@ -115,7 +115,7 @@ class Map():
 
     def get_pathfind_grid(self):
         """
-        Return a pathfind Grid with map data turned into booleans(1 or 0)
+        Return a pathfind Grid with map data turned into movement cost integers
         """
         grid_data = []
         for y in range(len(self.data)):

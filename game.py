@@ -5,6 +5,7 @@ import cursor
 import numpy
 from maps import Map
 from character import Character
+from menu import Button
 
 app_width = 512  # Start width
 app_height = 512  # Start height
@@ -116,6 +117,7 @@ create_window((app_width, app_height))
 create_menu_bar()
 set_sdl()
 create_screen((app_width, app_height))
+test_button = Button(screen, (16, 208, 24), (0, 0), (128, 32), "Test")
 
 
 # Create cursor to replace the awkward default one.
@@ -184,13 +186,15 @@ def game_loop():
     global root
     global current_map
     global update_interval
-    try:
+    # try:
+    if current_map:
         current_map.draw()
         for char in current_map.character_list:
             char.move(update_interval)
             mark_positions(char.move_sequence)
-    except Exception:
-        pass
+    test_button.draw()
+    # except Exception:
+    #     pass
 
     get_kb_input()
     get_mouse_input()

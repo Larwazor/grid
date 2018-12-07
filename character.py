@@ -32,9 +32,10 @@ class Character():
 
     def set_target_and_dir(self):
         """Get last item in move sequence and calculate direction"""
-        self.target_pos = self.move_sequence[-1]
-        self.move_dir = (self.target_pos[0] - self.pos[0],
-                         self.target_pos[1] - self.pos[1])
+        if self.move_sequence:
+            self.target_pos = self.move_sequence[-1]
+            self.move_dir = (self.target_pos[0] - self.pos[0],
+                             self.target_pos[1] - self.pos[1])
 
     def move(self, update_interval):
         """Calculates drawing position and moves actual position after"""
@@ -50,6 +51,9 @@ class Character():
 
             # Get new target
             self.set_target_and_dir()
+
+        if not self.move_dir or not self.target_pos:
+            return
 
         approx_tolerance = 0.05  # Tolerance to be considered being close to target
 
