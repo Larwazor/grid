@@ -5,7 +5,7 @@ import cursor
 import numpy
 from maps import Map
 from character import Character
-from menu import Button
+from menu import Menu, MenuButton
 
 app_width = 512  # Start width
 app_height = 512  # Start height
@@ -117,7 +117,10 @@ create_window((app_width, app_height))
 create_menu_bar()
 set_sdl()
 create_screen((app_width, app_height))
-test_button = Button(screen, (16, 208, 24), (0, 0), (128, 32), "Test")
+test_menu = Menu(screen, (222, 222, 222), (128, 0), (256, 32))
+test_button = MenuButton(screen, (16, 208, 24), (0, 0),
+                         (128, 32), "Test", (64, 255, 96))
+test_menu.children.append(test_button)
 
 
 # Create cursor to replace the awkward default one.
@@ -192,7 +195,7 @@ def game_loop():
         for char in current_map.character_list:
             char.move(update_interval)
             mark_positions(char.move_sequence)
-    test_button.draw()
+    test_menu.draw()
     # except Exception:
     #     pass
 
