@@ -121,13 +121,23 @@ create_window((app_width, app_height))
 create_menu_bar()
 set_sdl()
 create_screen((app_width, app_height))
-test_menu = Menu(screen, (222, 222, 222), (0, 0), (256, 32))
-test_button = MenuButton(screen, (16, 208, 24), (0, 0),
-                         (128, 32), "Test", highlight_color=(64, 255, 96), click_color=(128, 255, 192), command=(test_func, 'button 1'))
-test_button2 = MenuButton(screen, (16, 208, 24), (0, 0),
-                          (128, 32), "Test", highlight_color=(64, 255, 96), click_color=(128, 255, 192), command=(test_func, 'button 2'))
-test_menu.children.append(test_button)
-test_menu.children.append(test_button2)
+test_menu = Menu(screen, (208, 208, 208), (0, 0), (512, 32))
+# test_button = MenuButton(screen, (16, 208, 24), (0, 0),
+#                          (128, 32), "Test", highlight_color=(64, 255, 96), click_color=(128, 255, 192), command=(test_func, 'button 1'))
+# test_button2 = MenuButton(screen, (16, 208, 24), (0, 0),
+#                           (128, 32), "Test", highlight_color=(64, 255, 96), click_color=(128, 255, 192), command=(test_func, 'button 2'))
+# test_menu.children.append(test_button)
+# test_menu.children.append(test_button2)
+# test_menu.add_menu_button((16, 208, 24), (128, 32), text="Test!", highlight_color=(
+#     64, 255, 96), click_color=(128, 255, 192), command=(test_func, 'test btn 1'))
+# test_menu.add_menu_button((208, 16, 24), (128, 32), text="Test2!", highlight_color=(
+# 255, 64, 96), click_color=(255, 128, 192), command=(test_func, 'test btn 2'))
+button_0 = test_menu.add_menu_button(
+    text='Button 00', command=(test_func, 'new button 00'))
+# button_1 = test_menu.add_menu_button(
+#     text='Button 10', command=(test_func, 'new button 10'))
+button_0_0 = button_0.add_menu_button(
+    text='Button 01', command=(test_func, 'new button 01'), h_layout=False)
 
 
 # Create cursor to replace the awkward default one.
@@ -172,7 +182,7 @@ def get_mouse_input():
     if mouse_on_window():
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                test_menu.process_click(pygame.mouse.get_pos())
+                test_menu.process_click()
                 try:
                     mouse_tile_pos = (pygame.mouse.get_pos()[
                         0] // current_map.cell_size, pygame.mouse.get_pos()[1] // current_map.cell_size)
