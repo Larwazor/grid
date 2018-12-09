@@ -1,7 +1,10 @@
 import pygame
+from functools import partial
 
 
 class Menu():
+    """Menu parent"""
+
     def __init__(self, screen, color, pos, size):
         self.screen = screen
         self.color = color
@@ -10,10 +13,6 @@ class Menu():
         self.width = size[0]
         self.height = size[1]
         self.children = []
-
-    # def add_menu_button(self, screen, color, pos, size, text=''):
-    #     button = MenuButton(screen, color, pos, size, text)
-    #     self.children.append(button)
 
     def draw(self):
 
@@ -28,12 +27,26 @@ class Menu():
 
 
 class MenuButton(Menu):
-    def __init__(self, screen, color, pos, size, text='', highlight_color=None):
+    """Menu button
+
+        **command accepts a callable or a callable and a parameter as a list
+    """
+
+    def __init__(self, screen, color, pos, size, text='', highlight_color=None, command=None):
         super().__init__(screen, color, pos, size)
         self.text = text
         self.orig_color = color
         self.highlight_color = highlight_color
+        self.command = command
         pygame.font.init()
+
+    def perform_action(self):
+        """Calls command with possible argument"""
+        if self.command:
+            if not callable(self.command):
+                partial(self.command[0])(self.command[1])
+            else:
+                partial(self.command)()
 
     def draw(self):
 
@@ -57,6 +70,7 @@ class MenuButton(Menu):
         if mouse_pos[0] > self.x and mouse_pos[0] < self.x + self.width:
             if mouse_pos[1] > self.y and mouse_pos[1] < self.y + self.height:
                 self.color = self.highlight_color
+                self.perform_action()
                 return True
         self.color = self.orig_color
         return False

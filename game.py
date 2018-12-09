@@ -111,6 +111,10 @@ def create_screen(screen_size):
     screen.fill(pygame.Color(31, 31, 31))
 
 
+def test_func(text='default'):
+    print('test', text)
+
+
 # Initialize
 root = tk.Tk()
 create_window((app_width, app_height))
@@ -119,7 +123,7 @@ set_sdl()
 create_screen((app_width, app_height))
 test_menu = Menu(screen, (222, 222, 222), (128, 0), (256, 32))
 test_button = MenuButton(screen, (16, 208, 24), (0, 0),
-                         (128, 32), "Test", (64, 255, 96))
+                         (128, 32), "Test", highlight_color=(64, 255, 96), command=(test_func, 'not default'))
 test_menu.children.append(test_button)
 
 
