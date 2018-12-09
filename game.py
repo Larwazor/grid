@@ -121,10 +121,13 @@ create_window((app_width, app_height))
 create_menu_bar()
 set_sdl()
 create_screen((app_width, app_height))
-test_menu = Menu(screen, (222, 222, 222), (128, 0), (256, 32))
+test_menu = Menu(screen, (222, 222, 222), (0, 0), (256, 32))
 test_button = MenuButton(screen, (16, 208, 24), (0, 0),
-                         (128, 32), "Test", highlight_color=(64, 255, 96), command=(test_func, 'not default'))
+                         (128, 32), "Test", highlight_color=(64, 255, 96), click_color=(128, 255, 192), command=(test_func, 'button 1'))
+test_button2 = MenuButton(screen, (16, 208, 24), (0, 0),
+                          (128, 32), "Test", highlight_color=(64, 255, 96), click_color=(128, 255, 192), command=(test_func, 'button 2'))
 test_menu.children.append(test_button)
+test_menu.children.append(test_button2)
 
 
 # Create cursor to replace the awkward default one.
@@ -169,11 +172,12 @@ def get_mouse_input():
     if mouse_on_window():
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                test_menu.process_click(pygame.mouse.get_pos())
                 try:
-                    mouse_pos = (pygame.mouse.get_pos()[
+                    mouse_tile_pos = (pygame.mouse.get_pos()[
                         0] // current_map.cell_size, pygame.mouse.get_pos()[1] // current_map.cell_size)
-                    flash_pos(mouse_pos)
-                    current_map.character_list[0].find_path_to(mouse_pos)
+                    flash_pos(mouse_tile_pos)
+                    current_map.character_list[0].find_path_to(mouse_tile_pos)
                 except AttributeError:
                     pass
 
@@ -193,15 +197,12 @@ def game_loop():
     global root
     global current_map
     global update_interval
-    # try:
     if current_map:
         current_map.draw()
         for char in current_map.character_list:
             char.move(update_interval)
             mark_positions(char.move_sequence)
     test_menu.draw()
-    # except Exception:
-    #     pass
 
     get_kb_input()
     get_mouse_input()
