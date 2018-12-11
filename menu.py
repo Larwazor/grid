@@ -5,6 +5,8 @@ from functools import partial
 class Menu():
     """Menu parent"""
 
+    active_menu = []
+
     def __init__(self, screen, color, pos, size):
         self.screen = screen
         self.color = color
@@ -15,8 +17,6 @@ class Menu():
         self.children = []
 
     def process_click(self):
-        # print(click_pos)
-
         for child in self.children:
             child.get_clicked()
 
@@ -60,11 +60,11 @@ class MenuButton(Menu):
         self.highlight_color = highlight_color if highlight_color != None else color
         self.click_color = click_color if click_color != None else color
         self.command = command
-        self.hover = False
+        self.hover = False  # Is mouse over self
         self.flash_duration = 5  # How many screen refreshes is the click color shown
         self.click_timer = self.flash_duration
-        self.h_layout = h_layout
-        self.is_active = False
+        self.h_layout = h_layout  # Whether children are ordered horizontally or vertically
+        self.is_active = False  # Should we be shown
         self.parent = parent
         pygame.font.init()
 
@@ -72,14 +72,20 @@ class MenuButton(Menu):
         """Calls command with possible argument"""
 
         if self.hover:
-            for child in self.children:
-                child.is_active = True
+            # If we are last child in menu tree, self and siblings inactive
+            if not self.children:
+                self.close_menu()
+            # If we are top menu button, set children active
+            else:
+                self.open_menu()
+            # Call command if we have one
             if self.command:
                 if not callable(self.command):
                     self.click_timer = self.flash_duration  # Reset click timer
                     partial(self.command[0])(self.command[1])
                 else:
                     partial(self.command)()
+        # Recurse click to check if a child is hovered
         else:
             for child in self.children:
                 child.get_clicked()
@@ -91,7 +97,7 @@ class MenuButton(Menu):
         if not self.is_active:
             return
 
-        self.hover = self.mouse_over(pygame.mouse.get_pos())
+        self.hover = self.mouse_over()
 
         if self.hover:
             if self.click_timer > 0:  # Recently clicked
@@ -100,19 +106,6 @@ class MenuButton(Menu):
                 self.color = self.highlight_color
         else:
             self.color = self.orig_color
-
-        # child_hover = False
-        # for child in self.children:
-        #     if child.hover:
-        #         child_hover = True
-        #         print('child hover')
-        #         # continue
-
-        # for child in self.children:
-        #     if child_hover or self.hover:
-        #         child.is_active = True
-        #     else:
-        #         child.is_active = False
 
         super().draw()
 
@@ -123,13 +116,24 @@ class MenuButton(Menu):
             self.screen.blit(text, (self.x + (self.width/2 - text.get_width()/2),
                                     self.y + (self.height/2 - text.get_height()/2)))
 
-    def mouse_over(self, mouse_pos):
-
+    def mouse_over(self):
+        mouse_pos = pygame.mouse.get_pos()
         if not pygame.mouse.get_focused():
             self.color = self.orig_color
-            return
+            return False
 
         if mouse_pos[0] > self.x and mouse_pos[0] < self.x + self.width:
             if mouse_pos[1] > self.y and mouse_pos[1] < self.y + self.height:
                 return True
         return False
+
+    def open_menu(self):
+        Menu.active_menu = [child for child in self.children]
+        Menu.active_menu.append(self)
+        for item in Menu.active_menu:
+            item.is_active = True
+
+    def close_menu(self):
+        for item in Menu.active_menu[:-1]:
+            item.is_active = False
+        Menu.active_menu = []

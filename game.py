@@ -134,10 +134,17 @@ test_menu = Menu(screen, (208, 208, 208), (0, 0), (512, 32))
 # 255, 64, 96), click_color=(255, 128, 192), command=(test_func, 'test btn 2'))
 button_0 = test_menu.add_menu_button(
     text='Button 00', command=(test_func, 'new button 00'))
-# button_1 = test_menu.add_menu_button(
-#     text='Button 10', command=(test_func, 'new button 10'))
 button_0_0 = button_0.add_menu_button(
     text='Button 01', command=(test_func, 'new button 01'), h_layout=False)
+button_0_1 = button_0.add_menu_button(
+    text='Button 02', command=(test_func, 'new button 02'), h_layout=False)
+
+button_1 = test_menu.add_menu_button(
+    text='Button 10', command=(test_func, 'new button 10'))
+button_1_0 = button_1.add_menu_button(
+    text='Button 11', command=(test_func, 'new button 11'), h_layout=False)
+button_1_1 = button_1.add_menu_button(
+    text='Button 12', command=(test_func, 'new button 12'), h_layout=False)
 
 
 # Create cursor to replace the awkward default one.
