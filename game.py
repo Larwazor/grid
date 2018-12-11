@@ -5,7 +5,7 @@ import cursor
 import numpy
 from maps import Map
 from character import Character
-from menu import Menu, MenuButton
+from menu import MenuBar, Menu, MenuItem
 
 app_width = 512  # Start width
 app_height = 512  # Start height
@@ -121,7 +121,7 @@ create_window((app_width, app_height))
 create_menu_bar()
 set_sdl()
 create_screen((app_width, app_height))
-test_menu = Menu(screen, (208, 208, 208), (0, 0), (512, 32))
+# test_menu = Menu(screen, (208, 208, 208), (0, 0), (512, 32))
 # test_button = MenuButton(screen, (16, 208, 24), (0, 0),
 #                          (128, 32), "Test", highlight_color=(64, 255, 96), click_color=(128, 255, 192), command=(test_func, 'button 1'))
 # test_button2 = MenuButton(screen, (16, 208, 24), (0, 0),
@@ -132,19 +132,24 @@ test_menu = Menu(screen, (208, 208, 208), (0, 0), (512, 32))
 #     64, 255, 96), click_color=(128, 255, 192), command=(test_func, 'test btn 1'))
 # test_menu.add_menu_button((208, 16, 24), (128, 32), text="Test2!", highlight_color=(
 # 255, 64, 96), click_color=(255, 128, 192), command=(test_func, 'test btn 2'))
-button_0 = test_menu.add_menu_button(
-    text='Button 00', command=(test_func, 'new button 00'))
-button_0_0 = button_0.add_menu_button(
-    text='Button 01', command=(test_func, 'new button 01'), h_layout=False)
-button_0_1 = button_0.add_menu_button(
-    text='Button 02', command=(test_func, 'new button 02'), h_layout=False)
+# button_0 = test_menu.add_menu_button(
+#     text='Button 00', command=(test_func, 'new button 00'))
+# button_0_0 = button_0.add_menu_button(
+#     text='Button 01', command=(test_func, 'new button 01'), h_layout=False)
+# button_0_1 = button_0.add_menu_button(
+#     text='Button 02', command=(test_func, 'new button 02'), h_layout=False)
 
-button_1 = test_menu.add_menu_button(
-    text='Button 10', command=(test_func, 'new button 10'))
-button_1_0 = button_1.add_menu_button(
-    text='Button 11', command=(test_func, 'new button 11'), h_layout=False)
-button_1_1 = button_1.add_menu_button(
-    text='Button 12', command=(test_func, 'new button 12'), h_layout=False)
+# button_1 = test_menu.add_menu_button(
+#     text='Button 10', command=(test_func, 'new button 10'))
+# button_1_0 = button_1.add_menu_button(
+#     text='Button 11', command=(test_func, 'new button 11'), h_layout=False)
+# button_1_1 = button_1.add_menu_button(
+#     text='Button 12', command=(test_func, 'new button 12'), h_layout=False)
+main_menu = MenuBar(screen)
+menu0 = main_menu.add_menu('Menu 0', command=(test_func, 'Menu 0'))
+menu1 = main_menu.add_menu('Menu 1', command=(test_func, 'Menu 1'))
+item01 = menu0.add_item('Item 01', command=(test_func, 'Item 01'))
+item02 = menu0.add_item('Item 02', command=(test_func, 'Item 02'))
 
 
 # Create cursor to replace the awkward default one.
@@ -189,7 +194,7 @@ def get_mouse_input():
     if mouse_on_window():
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                test_menu.process_click()
+                main_menu.process_click()
                 try:
                     mouse_tile_pos = (pygame.mouse.get_pos()[
                         0] // current_map.cell_size, pygame.mouse.get_pos()[1] // current_map.cell_size)
@@ -219,7 +224,7 @@ def game_loop():
         for char in current_map.character_list:
             char.move(update_interval)
             mark_positions(char.move_sequence)
-    test_menu.draw()
+    main_menu.draw()
 
     get_kb_input()
     get_mouse_input()
