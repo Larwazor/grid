@@ -11,6 +11,9 @@ class MenuBar():
         self.pos = pos
         self.size = size
         self.children = []
+        self.open_menu = None
+        self.menu_active = False
+        self.hovered_menu = None
         pygame.font.init()
 
     def draw(self):
@@ -24,6 +27,8 @@ class MenuBar():
         for child in self.children:
             child.draw()
 
+        print(self.hovered_menu)
+
     def process_click(self):
 
         for child in self.children:
@@ -35,9 +40,16 @@ class MenuBar():
                     grandchild.get_clicked()
                     break
 
+    def open_menu(self, menu):
+        for child in self.children():
+            if child == menu:
+                menu.open()
+            else:
+                menu.close()
+
     def add_menu(self, text='', command=None):
         menu_size = (int(self.size[0] / 4), self.size[1])
-        menu = Menu(self.screen, (100, 100, 20),
+        menu = Menu(self, self.screen, (100, 100, 20),
                     self.pos.copy(), menu_size, text=text, highlight_color=(150, 150, 70), click_color=(200, 200, 100), command=command)
 
         menu.pos[0] = self.pos[0] + len(self.children) * menu_size[0]
@@ -49,7 +61,8 @@ class MenuBar():
 class Menu():
     """Menu parent"""
 
-    def __init__(self, screen, color, pos, size, text='', highlight_color=None, click_color=None, command=None):
+    def __init__(self, parent, screen, color, pos, size, text='', highlight_color=None, click_color=None, command=None):
+        self.parent = parent
         self.screen = screen
         self.color = color
         self.pos = pos
@@ -103,6 +116,12 @@ class Menu():
 
         if mouse_pos[0] > self.pos[0] and mouse_pos[0] < self.pos[0] + self.size[0]:
             if mouse_pos[1] > self.pos[1] and mouse_pos[1] < self.pos[1] + self.size[1]:
+
+                if self.children:
+                    self.parent.hovered_menu = self
+                elif self.parent.parent:
+                    self.parent.parent.hovered_menu = self.parent
+
                 return True
         return False
 
@@ -110,8 +129,7 @@ class Menu():
 
         self.click_timer = self.flash_duration  # Reset click timer
 
-        for child in self.children:
-            child.is_active = True
+        self.open()
 
         if self.command:
             if not callable(self.command):
@@ -119,8 +137,16 @@ class Menu():
             else:
                 partial(self.command)()
 
+    def open(self):
+        for child in self.children:
+            child.is_active = True
+
+    def close(self):
+        for child in self.children:
+            child.is_active = False
+
     def add_item(self, text='', command=None):
-        item = MenuItem(self.screen, self.color, self.pos.copy(),
+        item = MenuItem(self, self.screen, self.color, self.pos.copy(),
                         self.size, text=text, highlight_color=self.highlight_color, command=command)
 
         item.pos[1] = self.pos[1] + (item.size[1] * (len(self.children) + 1))
@@ -131,21 +157,23 @@ class Menu():
 
 class MenuItem(Menu):
 
-    def __init__(self, screen, color, pos, size, text='', highlight_color=None, click_color=None, command=None):
-        super().__init__(screen, color, pos, size, text=text,
+    def __init__(self, parent, screen, color, pos, size, text='', highlight_color=None, click_color=None, command=None):
+        super().__init__(parent, screen, color, pos, size, text=text,
                          highlight_color=highlight_color, click_color=click_color, command=command)
-        self.parent = None
         self.is_active = False
 
     def get_clicked(self):
+
         if self.command:
             if not callable(self.command):
                 partial(self.command[0])(self.command[1])
             else:
                 partial(self.command)()
 
+        self.parent.close()
+
     def draw(self):
-        """Draws self and calls draw on children"""
+        """Draws self"""
 
         if not self.screen or not self.is_active:
             return

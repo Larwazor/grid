@@ -150,6 +150,8 @@ menu0 = main_menu.add_menu('Menu 0', command=(test_func, 'Menu 0'))
 menu1 = main_menu.add_menu('Menu 1', command=(test_func, 'Menu 1'))
 item01 = menu0.add_item('Item 01', command=(test_func, 'Item 01'))
 item02 = menu0.add_item('Item 02', command=(test_func, 'Item 02'))
+item11 = menu1.add_item('Item 11', command=(test_func, 'Item 11'))
+item12 = menu1.add_item('Item 12', command=(test_func, 'Item 12'))
 
 
 # Create cursor to replace the awkward default one.
