@@ -226,7 +226,7 @@ def game_loop():
         for char in current_map.character_list:
             char.move(update_interval)
             mark_positions(char.move_sequence)
-    main_menu.draw()
+    main_menu.update()
 
     get_kb_input()
     get_mouse_input()
