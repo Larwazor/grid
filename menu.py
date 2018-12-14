@@ -59,14 +59,20 @@ class MenuBar():
                 child.draw()
 
     def process_click(self):
-        """Calls click on a hovered child or closes all menus if click is outside menu items"""
+        """Calls click on a children
+
+        Finds out if a child has hover and calls click. If not, closes all open menus.
+        Returns True if a click hit a menu object, False otherwise."""
         for child in self.children:
             if child.hover:
-                child.get_clicked()
                 if child.is_active:
-                    break
+                    child.get_clicked()
+                    return True
+                child.get_clicked()
+
         else:
             self.close_menus()
+            return False
 
     def close_menus(self):
         """Close the currently open menu"""
@@ -148,7 +154,7 @@ class Menu():
 
         if self.command:
             if not callable(self.command):
-                partial(self.command[0])(self.command[1])
+                partial(self.command[0])(*self.command[1:])
             else:
                 partial(self.command)()
 
@@ -191,7 +197,7 @@ class MenuItem(Menu):
 
         if self.command:
             if not callable(self.command):
-                partial(self.command[0])(self.command[1])
+                partial(self.command[0])(*self.command[1:])
             else:
                 partial(self.command)()
 
