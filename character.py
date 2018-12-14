@@ -6,7 +6,8 @@ class Character():
     """Basic game character"""
 
     def __init__(self, image, start_pos, map, screen):
-        self.image = pygame.image.load('images/' + image)
+        self.orig_image = pygame.image.load('images/' + image)
+        self.image = self.orig_image.copy()
         self.pos = list(start_pos)
         self.draw_pos = self.pos.copy()
         self.map = map
@@ -24,7 +25,7 @@ class Character():
         original_size = self.image.get_rect().size
         if original_size[0] != self.map.cell_size or original_size[1] != self.map.cell_size:
             self.image = pygame.transform.scale(
-                self.image, (self.map.cell_size, self.map.cell_size))
+                self.orig_image, (self.map.cell_size, self.map.cell_size))
 
     def draw(self):
         self.screen.blit(
