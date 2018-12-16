@@ -9,6 +9,7 @@ app_height = 512  # Start height
 screen = None
 current_map = None
 tile_size = 32
+menu_height = 32
 diagonal_move = False
 
 
@@ -32,7 +33,8 @@ def init_map(map_name):
     global screen
     global tile_size
     global diagonal_move
-    map = Map(map_name, tile_size, diagonal_movement=diagonal_move)
+    map = Map(map_name, tile_size, menu_height,
+              diagonal_movement=diagonal_move)
     map_size = map.get_size()
     create_screen(map_size)
     map.set_screen(screen)
@@ -55,7 +57,8 @@ def mark_positions(pos_list):
     """Mark list specified positions with a red circle"""
     for pos in pos_list:
         x_pos = pos[0]*current_map.cell_size + current_map.cell_size // 2
-        y_pos = pos[1] * current_map.cell_size + current_map.cell_size // 2
+        y_pos = pos[1] * current_map.cell_size + \
+            current_map.cell_size // 2 + menu_height  # + menu_height
         size = current_map.cell_size // 8
         pygame.draw.circle(screen, (255, 0, 0, 100), (x_pos, y_pos), size)
 
@@ -63,13 +66,14 @@ def mark_positions(pos_list):
 def add_character():
     global current_map
     global screen
-    char = Character('wizard.png', (5, 1), current_map, screen)
+    char = Character('wizard.png', (5, 1), current_map, screen, menu_height)
 
 
 def create_screen(screen_size):
     """Create Pygame screen."""
     global screen
-    screen = pygame.display.set_mode((screen_size[0], screen_size[1]))
+    screen = pygame.display.set_mode(
+        (screen_size[0], screen_size[1] + menu_height))
     draw_empty_screen()
 
 
@@ -88,7 +92,9 @@ def resize_tiles(size):
 
     if current_map:
         current_map.cell_size = size
-        pygame.display.set_mode(current_map.get_size())
+        screen_size = (current_map.get_size()[
+                       0], current_map.get_size()[1] + menu_height)
+        pygame.display.set_mode(screen_size)
         current_map.character_list[0].scale_image()
         main_menu.resize_width(new_width=current_map.get_size()[0])
 
@@ -106,7 +112,8 @@ pygame.display.set_caption('Grid Game')
 icon = pygame.image.load('images/wizard.png')
 pygame.display.set_icon(icon)
 cursor.create_cursor()
-main_menu = MenuBar(screen, size=[app_width, tile_size])
+init_map('map1')
+main_menu = MenuBar(screen, size=[app_width, menu_height])
 menu0 = main_menu.add_menu('Maps')
 menu1 = main_menu.add_menu('Tiles')
 menu2 = main_menu.add_menu('Settings')
@@ -152,7 +159,7 @@ def handle_mouse_input():
         return
     try:
         mouse_tile_pos = (pygame.mouse.get_pos()[
-            0] // current_map.cell_size, pygame.mouse.get_pos()[1] // current_map.cell_size)
+            0] // current_map.cell_size, (pygame.mouse.get_pos()[1] - menu_height) // current_map.cell_size)
         flash_pos(mouse_tile_pos)
         current_map.character_list[0].find_path_to(mouse_tile_pos)
     except AttributeError:

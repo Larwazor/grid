@@ -31,7 +31,7 @@ class Map():
 
     json_file = 'maps.json'
 
-    def __init__(self, map_to_load, cell_size, diagonal_movement=False):
+    def __init__(self, map_to_load, cell_size, menu_height, diagonal_movement=False):
 
         self.map_name = map_to_load
         self.data = self.load_map_from_json()
@@ -42,6 +42,7 @@ class Map():
         self.diagonal_movement = diagonal_movement
         self.pathfind_grid = self.get_pathfind_grid()
         self.screen = None
+        self.menu_height = menu_height
 
     @classmethod
     def save_map_data(cls, input_ndarray, map_name, output_file):
@@ -88,7 +89,7 @@ class Map():
         for y in range(self.height):
             for x in range(self.width):
                 rect = pygame.Rect(
-                    x*self.cell_size, y*self.cell_size, self.cell_size, self.cell_size)
+                    x*self.cell_size, y*self.cell_size + self.menu_height, self.cell_size, self.cell_size)  # has + menu_height
                 cell_color = self.data[y][x].color
                 pygame.draw.rect(self.screen, cell_color, rect)
 

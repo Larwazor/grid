@@ -1,6 +1,5 @@
 import pygame
 from functools import partial
-import time
 
 
 class MenuBar():
@@ -91,8 +90,6 @@ class MenuBar():
         self.size = [new_width, self.size[1]]
         child_size = self.get_child_size()
 
-        start = time.time()
-
         index = 0
 
         longest_child = None
@@ -114,10 +111,6 @@ class MenuBar():
                         (grand_child.size[0] * index)
                     grand_child.set_menu_text(font)
                 index += 1
-
-        end = time.time()
-
-        print(end-start)
 
     def add_menu(self, text='', command=None):
         """Creates a menu and sorts it horizontally with existing ones"""
@@ -173,9 +166,6 @@ class Menu():
                          (self.pos[0], self.pos[1], self.size[0], self.size[1]), 0)
 
         if self.text:
-
-            # if not self.menu_text:
-            #     self.menu_text = self.font.render(self.text, 1, (0, 0, 0))
             self.screen.blit(self.menu_text, (self.pos[0] + (self.size[0]/2 - self.menu_text.get_width()/2),
                                               self.pos[1] + (self.size[1]/2 - self.menu_text.get_height()/2)))
 
@@ -192,10 +182,7 @@ class Menu():
             font = pygame.font.SysFont(
                 'Verdana', (self.size[1]) - reduction)
             reduction += 1
-        #text = font.render(self.text, 1, (0, 0, 0))
-        #print('font:', font.size(self.text), 'self:', self.size, self.text)
-        #self.menu_text = text
-        print(font.size(self.text))
+        # print(font.size(self.text))
         return font
 
     def get_clicked(self):

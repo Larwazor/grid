@@ -5,7 +5,7 @@ import math
 class Character():
     """Basic game character"""
 
-    def __init__(self, image, start_pos, map, screen):
+    def __init__(self, image, start_pos, map, screen, menu_height):
         self.orig_image = pygame.image.load('images/' + image)
         self.image = self.orig_image.copy()
         self.pos = list(start_pos)
@@ -16,6 +16,7 @@ class Character():
         self.move_speed = 5.0
         self.move_sequence = []  # List of positions to traverse
         self.screen = screen
+        self.menu_height = menu_height
         self.target_pos = []  # Next position to move to
         self.move_dir = []  # Direction of movement
         self.queued_destination = []  # Queued destination from click
@@ -29,7 +30,7 @@ class Character():
 
     def draw(self):
         self.screen.blit(
-            self.image, (self.draw_pos[0] * self.map.cell_size, self.draw_pos[1] * self.map.cell_size))
+            self.image, (self.draw_pos[0] * self.map.cell_size, self.menu_height + self.draw_pos[1] * self.map.cell_size))  # has + menu_height
 
     def set_target_and_dir(self):
         """Get last item in move sequence and calculate direction"""
