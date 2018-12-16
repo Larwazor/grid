@@ -1,5 +1,6 @@
 import pygame
 from functools import partial
+import time
 
 
 class MenuBar():
@@ -80,15 +81,54 @@ class MenuBar():
             self.open_menu.close()
             self.open_menu = None
 
+    def get_child_size(self):
+        width = max(int(self.size[0] / 4), 64)
+        height = self.size[1]
+
+        return (width, height)
+
+    def resize_width(self, new_width=512, child_max_width=64):
+        self.size = [new_width, self.size[1]]
+        child_size = self.get_child_size()
+
+        start = time.time()
+
+        index = 0
+
+        longest_child = None
+
+        for child in self.children:
+            child.size = child_size
+            if not longest_child or len(child.text) > len(longest_child.text):
+                longest_child = child
+
+        font = longest_child.get_font()
+
+        for child in self.children:
+
+            if type(child) is Menu:
+                child.pos[0] = self.pos[0] + (child.size[0] * index)
+                child.set_menu_text(font)
+                for grand_child in child.children:
+                    grand_child.pos[0] = self.pos[0] + \
+                        (grand_child.size[0] * index)
+                    grand_child.set_menu_text(font)
+                index += 1
+
+        end = time.time()
+
+        print(end-start)
+
     def add_menu(self, text='', command=None):
         """Creates a menu and sorts it horizontally with existing ones"""
-        menu_size = (int(self.size[0] / 4), self.size[1])
+        child_size = self.get_child_size()
         menu = Menu(self, self.screen, (100, 100, 20),
-                    self.pos.copy(), menu_size, text=text, highlight_color=(150, 150, 70), click_color=(200, 200, 100), command=command)
+                    self.pos.copy(), child_size, text=text, highlight_color=(150, 150, 70), click_color=(200, 200, 100), command=command)
 
-        menu.pos[0] = self.pos[0] + len(self.children) * menu_size[0]
+        menu.pos[0] = self.pos[0] + len(self.children) * child_size[0]
 
         self.children.append(menu)
+        self.resize_width()
         return menu
 
 
@@ -102,6 +142,7 @@ class Menu():
         self.pos = pos
         self.size = size
         self.text = text
+        self.menu_text = None
         self.orig_color = color
         self.highlight_color = highlight_color if highlight_color != None else color
         self.click_color = click_color if click_color != None else color
@@ -132,11 +173,30 @@ class Menu():
                          (self.pos[0], self.pos[1], self.size[0], self.size[1]), 0)
 
         if self.text:
+
+            # if not self.menu_text:
+            #     self.menu_text = self.font.render(self.text, 1, (0, 0, 0))
+            self.screen.blit(self.menu_text, (self.pos[0] + (self.size[0]/2 - self.menu_text.get_width()/2),
+                                              self.pos[1] + (self.size[1]/2 - self.menu_text.get_height()/2)))
+
+    def set_menu_text(self, font):
+        self.menu_text = font.render(self.text, 1, (0, 0, 0))
+
+    def get_font(self):
+
+        font = pygame.font.SysFont(
+            'Verdana', self.size[1])
+
+        reduction = 1
+        while font.size(self.text)[1] + 1 > self.size[1] or font.size(self.text)[0] + 1 > self.size[0]:
             font = pygame.font.SysFont(
-                'Verdana, Segoe UI, Arial', int(self.size[1] * 0.75))
-            text = font.render(self.text, 1, (0, 0, 0))
-            self.screen.blit(text, (self.pos[0] + (self.size[0]/2 - text.get_width()/2),
-                                    self.pos[1] + (self.size[1]/2 - text.get_height()/2)))
+                'Verdana', (self.size[1]) - reduction)
+            reduction += 1
+        #text = font.render(self.text, 1, (0, 0, 0))
+        #print('font:', font.size(self.text), 'self:', self.size, self.text)
+        #self.menu_text = text
+        print(font.size(self.text))
+        return font
 
     def get_clicked(self):
         """Flash button and call the command"""
@@ -179,6 +239,7 @@ class Menu():
         item.parent = self
         self.children.append(item)
         self.parent.children.append(item)
+        self.parent.resize_width()
         return item
 
 
@@ -215,8 +276,5 @@ class MenuItem(Menu):
                          (self.pos[0], self.pos[1], self.size[0], self.size[1]), 0)
 
         if self.text:
-            font = pygame.font.SysFont(
-                'Verdana, Segoe UI, Arial', int(self.size[1] * 0.75))
-            text = font.render(self.text, 1, (0, 0, 0))
-            self.screen.blit(text, (self.pos[0] + (self.size[0]/2 - text.get_width()/2),
-                                    self.pos[1] + (self.size[1]/2 - text.get_height()/2)))
+            self.screen.blit(self.menu_text, (self.pos[0] + (self.size[0]/2 - self.menu_text.get_width()/2),
+                                              self.pos[1] + (self.size[1]/2 - self.menu_text.get_height()/2)))

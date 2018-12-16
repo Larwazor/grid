@@ -78,7 +78,7 @@ def draw_empty_screen():
 
 
 def resize_tiles(size):
-    """Test menu commands etc."""
+    """Resize tiles and apply changes to map and character"""
     global current_map
     global tile_size
     if size == tile_size:
@@ -90,6 +90,7 @@ def resize_tiles(size):
         current_map.cell_size = size
         pygame.display.set_mode(current_map.get_size())
         current_map.character_list[0].scale_image()
+        main_menu.resize_width(new_width=current_map.get_size()[0])
 
 
 def toggle_diagonal(diagonal):
@@ -105,7 +106,7 @@ pygame.display.set_caption('Grid Game')
 icon = pygame.image.load('images/wizard.png')
 pygame.display.set_icon(icon)
 cursor.create_cursor()
-main_menu = MenuBar(screen)
+main_menu = MenuBar(screen, size=[app_width, tile_size])
 menu0 = main_menu.add_menu('Maps')
 menu1 = main_menu.add_menu('Tiles')
 menu2 = main_menu.add_menu('Settings')
@@ -161,7 +162,7 @@ def handle_mouse_input():
 # Main loop
 running = True
 
-while True:
+while running:
     if current_map:
         current_map.draw()
         for char in current_map.character_list:
