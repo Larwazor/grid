@@ -1,5 +1,9 @@
 import pygame
 import math
+import time
+
+start = 0
+end = 0
 
 
 class Character():
@@ -41,7 +45,6 @@ class Character():
 
     def move(self, update_interval):
         """Calculates drawing position and moves actual position after"""
-
         self.draw()
 
         # No current target position
@@ -59,9 +62,9 @@ class Character():
 
         approx_tolerance = 0.05  # Tolerance to be considered being close to target
 
-        # Slow down movement by dividing if moving diagonally
-        divider = 1.4 if abs(
-            self.move_dir[0]) + abs(self.move_dir[1]) == 2 else 1
+        # Slow down movement by dividing if moving diagonally and take cell.size into account
+        divider = (1.4 if abs(
+            self.move_dir[0]) + abs(self.move_dir[1]) == 2 else 1) * (320 / self.map.cell_size)
         # Get movement cost from target tile
         terrain_speed = self.map.data[
             self.target_pos[1]][self.target_pos[0]].movement_cost
