@@ -5,7 +5,7 @@ from functools import partial
 class MenuBar():
     """Menu bar with menu objects as children"""
 
-    def __init__(self, screen, color=[0, 80, 60], pos=[0, 0], size=[512, 32]):
+    def __init__(self, screen, color=[255, 178, 102], pos=[0, 0], size=[512, 32]):
         self.screen = screen
         self.color = color
         self.pos = pos
@@ -115,8 +115,8 @@ class MenuBar():
     def add_menu(self, text='', command=None):
         """Creates a menu and sorts it horizontally with existing ones"""
         child_size = self.get_child_size()
-        menu = Menu(self, self.screen, (100, 100, 20),
-                    self.pos.copy(), child_size, text=text, highlight_color=(150, 150, 70), click_color=(200, 200, 100), command=command)
+        menu = Menu(self, self.screen, (255, 178, 102),
+                    self.pos.copy(), child_size, text=text, highlight_color=(255, 204, 153), click_color=(255, 229, 204), command=command)
 
         menu.pos[0] = self.pos[0] + len(self.children) * child_size[0]
 
@@ -140,11 +140,12 @@ class Menu():
         self.highlight_color = highlight_color if highlight_color != None else color
         self.click_color = click_color if click_color != None else color
         self.command = command
-        self.flash_duration = 5  # How many screen refreshes is the click color shown
+        self.flash_duration = 30  # How many screen refreshes is the click color shown
         self.click_timer = self.flash_duration
         self.children = []
         self.hover = False
         self.is_active = True
+        self.selected_child = None
 
     def draw(self):
         """Draws self and calls draw on children"""
@@ -170,10 +171,10 @@ class Menu():
                                               self.pos[1] + (self.size[1]/2 - self.menu_text.get_height()/2)))
 
     def set_menu_text(self, font):
-        self.menu_text = font.render(self.text, 1, (0, 0, 0))
+        self.menu_text = font.render(self.text, 1, (51, 25, 0))
 
     def get_font(self):
-
+        """Finds the biggest possible font for self.text to fit in the rect"""
         font = pygame.font.SysFont(
             'Verdana', self.size[1])
 
@@ -182,7 +183,6 @@ class Menu():
             font = pygame.font.SysFont(
                 'Verdana', (self.size[1]) - reduction)
             reduction += 1
-        # print(font.size(self.text))
         return font
 
     def get_clicked(self):
@@ -217,10 +217,10 @@ class Menu():
         for child in self.children:
             child.is_active = False
 
-    def add_item(self, text='', command=None):
+    def add_item(self, text='', command=None, selected=False):
         """Adds a menu item and sorts it vertically with others"""
         item = MenuItem(self, self.screen, self.color, self.pos.copy(),
-                        self.size, text=text, highlight_color=self.highlight_color, command=command)
+                        self.size, text=text, highlight_color=self.highlight_color, command=command, selected=selected)
 
         item.pos[1] = self.pos[1] + (item.size[1] * (len(self.children) + 1))
         item.parent = self
@@ -232,10 +232,12 @@ class Menu():
 
 class MenuItem(Menu):
 
-    def __init__(self, parent, screen, color, pos, size, text='', highlight_color=None, click_color=None, command=None):
+    def __init__(self, parent, screen, color, pos, size, text='', highlight_color=None, click_color=None, command=None, selected=False):
         super().__init__(parent, screen, color, pos, size, text=text,
                          highlight_color=highlight_color, click_color=click_color, command=command)
         self.is_active = False
+        if selected:
+            self.get_selected()
 
     def get_clicked(self):
         """Calls command and closes parent menu"""
@@ -251,6 +253,8 @@ class MenuItem(Menu):
 
         self.parent.close()
 
+        self.get_selected()
+
     def draw(self):
         """Draws self"""
 
@@ -265,3 +269,10 @@ class MenuItem(Menu):
         if self.text:
             self.screen.blit(self.menu_text, (self.pos[0] + (self.size[0]/2 - self.menu_text.get_width()/2),
                                               self.pos[1] + (self.size[1]/2 - self.menu_text.get_height()/2)))
+
+        if self.parent.selected_child == self:
+            pygame.draw.rect(self.screen, (153, 76, 0),
+                             (self.pos[0] + 1, self.pos[1] + 1, self.size[0] - 2, self.size[1]-2), 1)
+
+    def get_selected(self):
+        self.parent.selected_child = self

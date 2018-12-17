@@ -96,8 +96,7 @@ class Character():
     def move_to_direction(self, direction, clear_sequence=False):
         """Set movement direction
 
-            Used for keyboard movement.
-            Currently not in use.
+            Keyboard movement.
         """
         desired_pos = self.pos.copy()
 
