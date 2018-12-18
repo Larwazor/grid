@@ -2,7 +2,7 @@ import pygame
 import cursor
 from maps import Map
 from character import Character
-from menu import MenuBar, Menu, MenuItem
+from menu import MenuBar
 
 app_width = 512  # Start width
 app_height = 512  # Start height
