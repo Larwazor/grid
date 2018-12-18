@@ -65,7 +65,7 @@ class Map():
         self.screen = screen
 
     def load_map_from_json(self):
-        """Loads a map layout from json file and converts it to numpy two dimensional array."""
+        """Loads a map layout from json file and converts it to dimensional list."""
         with open(Map.json_file) as f:
             json_data = json.load(f)
 

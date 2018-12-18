@@ -41,7 +41,7 @@ class MenuBar():
                     self.hover_child = child
                     child.hover = True
                     # If a menu has been clicked open but cursor is over another menu, open that one with a click
-                    if self.open_menu and self.open_menu != child and child.children:
+                    if self.open_menu and self.open_menu != child and child.children:  # Has children, i.e. is a top menu
                         child.get_clicked()
                     continue
             child.hover = False
@@ -61,14 +61,14 @@ class MenuBar():
     def process_click(self):
         """Calls click on a children
 
-        Finds out if a child has hover and calls click. If not, closes all open menus.
+        Finds out if a child has hover and calls click on it. If not, closes all open menus.
         Returns True if a click hit a menu object, False otherwise."""
-        for child in self.children:
-            if child.hover:
-                if child.is_active:
-                    child.get_clicked()
-                    return True
-                child.get_clicked()
+
+        if self.hover_child:
+            if self.hover_child.is_active:
+                self.hover_child.get_clicked()
+                return True
+            self.hover_child.get_clicked()
 
         else:
             self.close_menus()
@@ -81,16 +81,16 @@ class MenuBar():
             self.open_menu = None
 
     def get_child_size(self):
+        """Gets a size for top menus, 25% of own size or at least 64px"""
         width = max(int(self.size[0] / 4), 64)
         height = self.size[1]
 
         return (width, height)
 
-    def resize_width(self, new_width=512, child_max_width=64):
+    def resize_width(self, new_width=512):
+        """Scale self and all children menu objects to a new width"""
         self.size = [new_width, self.size[1]]
         child_size = self.get_child_size()
-
-        index = 0
 
         longest_child = None
 
@@ -101,7 +101,7 @@ class MenuBar():
 
         font = longest_child.get_font()
 
-        for child in self.children:
+        for index, child in enumerate(self.children):
 
             if type(child) is Menu:
                 child.pos[0] = self.pos[0] + (child.size[0] * index)
@@ -110,7 +110,6 @@ class MenuBar():
                     grand_child.pos[0] = self.pos[0] + \
                         (grand_child.size[0] * index)
                     grand_child.set_menu_text(font)
-                index += 1
 
     def add_menu(self, text='', command=None):
         """Creates a menu and sorts it horizontally with existing ones"""
