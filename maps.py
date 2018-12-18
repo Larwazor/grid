@@ -1,5 +1,4 @@
 import json
-import numpy
 import pygame
 from pathfind import Grid
 
@@ -72,11 +71,12 @@ class Map():
 
         height = len(json_data[self.map_name])
         width = len(json_data[self.map_name][0])
-        map = numpy.empty((height, width), dtype=Tile)
+        map = []
 
         for y in range(height):
+            map.append([])
             for x in range(width):
-                map[y][x] = Tile(json_data[self.map_name][y][x])
+                map[y].append(Tile(json_data[self.map_name][y][x]))
 
         return map
 
