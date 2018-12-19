@@ -12,9 +12,7 @@ class MenuBar():
         self.size = size
         self.children = []
         self.open_menu = None
-        self.hovered_menu = None
         self.hover_child = None
-        self.cached_hover = None
         pygame.font.init()
 
     def update(self):
@@ -34,7 +32,6 @@ class MenuBar():
 
         mouse_pos = pygame.mouse.get_pos()
 
-        # found_hover = False
         # Find child under cursor
         for child in self.children:
             if mouse_pos[0] > child.pos[0] and mouse_pos[0] < child.pos[0] + child.size[0]:
@@ -49,9 +46,6 @@ class MenuBar():
                         child.get_clicked()
                     continue
             child.hover = False
-
-        # if not found_hover:
-        #     self.hover_child = None
 
     def draw(self):
         """Draws self and calls draw on children"""

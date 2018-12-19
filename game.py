@@ -42,30 +42,17 @@ def init_map(map_name):
     add_character()
 
 
-def flash_pos(pos):
-    """Flash a position on map"""
-    flash_size = current_map.cell_size
-    flash_color = (255, 0, 0)
-    current_map.get_pos(pos)
-    rect = pygame.Rect(pos[0]*flash_size, pos[1] *
-                       flash_size, flash_size, flash_size)
-
-    pygame.draw.rect(screen, flash_color, rect)
-
-
 def mark_positions(pos_list):
-    """Mark list specified positions with a red circle"""
+    """Mark list specified positions with a circle"""
     for pos in pos_list:
         x_pos = pos[0]*current_map.cell_size + current_map.cell_size // 2
         y_pos = pos[1] * current_map.cell_size + \
             current_map.cell_size // 2 + menu_height  # + menu_height
         size = current_map.cell_size // 8
-        pygame.draw.circle(screen, (255, 0, 0, 100), (x_pos, y_pos), size)
+        pygame.draw.circle(screen, (0, 255, 0, 100), (x_pos, y_pos), size)
 
 
 def add_character():
-    global current_map
-    global screen
     char = Character('wizard.png', (5, 1), current_map, screen, menu_height)
 
 
@@ -78,6 +65,7 @@ def create_screen(screen_size):
 
 
 def draw_empty_screen():
+    """Fill screen with color if there is no map"""
     screen.fill(pygame.Color(31, 31, 31))
 
 
@@ -161,7 +149,7 @@ def handle_mouse_input():
     try:
         mouse_tile_pos = (pygame.mouse.get_pos()[
             0] // current_map.cell_size, (pygame.mouse.get_pos()[1] - menu_height) // current_map.cell_size)
-        flash_pos(mouse_tile_pos)
+        current_map.flash_pos(mouse_tile_pos, (0, 255, 0), 20)
         current_map.character_list[0].find_path_to(mouse_tile_pos)
     except AttributeError:
         pass

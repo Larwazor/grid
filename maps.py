@@ -10,6 +10,7 @@ class Tile():
 
         self.movement_cost = None
         self.color = None
+        self.orig_color = None
 
         if identifier == 'X':  # Wall
             self.movement_cost = 0
@@ -23,6 +24,8 @@ class Tile():
         elif identifier == 'w':  # Water
             self.movement_cost = 60
             self.color = (0, 90, 120)
+
+        self.orig_color = self.color
 
 
 class Map():
@@ -42,6 +45,8 @@ class Map():
         self.pathfind_grid = self.get_pathfind_grid()
         self.screen = None
         self.menu_height = menu_height
+        self.flashed_pos = None
+        self.flash_timer = 0
 
     @classmethod
     def save_map_data(cls, input_ndarray, map_name, output_file):
@@ -81,17 +86,39 @@ class Map():
         return map
 
     def get_size(self):
+        """Calculates map size based on amount of tiles and their size in pixels"""
         w_width = self.cell_size * self.width
         w_height = self.cell_size * self.height
         return (w_width, w_height)
 
     def draw(self):
+        """Draws all tiles on the map"""
+        self.update_flashed()
+
         for y in range(self.height):
             for x in range(self.width):
                 rect = pygame.Rect(
                     x*self.cell_size, y*self.cell_size + self.menu_height, self.cell_size, self.cell_size)  # has + menu_height
                 cell_color = self.data[y][x].color
                 pygame.draw.rect(self.screen, cell_color, rect)
+
+    def flash_pos(self, pos, color, frames):
+        """Change positions color for a fixed amount of frames"""
+        self.flashed_pos = self.get_pos(pos)
+        self.flashed_pos.color = color
+        self.flash_timer = frames
+
+    def update_flashed(self):
+        """Update flashed position
+
+            Reduce flash timer until 0 at which point reset flashed position.        
+        """
+        if self.flash_timer > 0:
+            self.flash_timer -= 1
+        else:
+            if self.flashed_pos:
+                self.flashed_pos.color = self.flashed_pos.orig_color
+                self.flashed_pos = None
 
     def contains_position(self, pos):
         """Test if position is on the map"""
