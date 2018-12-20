@@ -29,7 +29,10 @@ class Node():
 
 
 class Grid():
-    """Represents a grid based map of integers for pathfinding."""
+    """Represents a grid based map of integers for pathfinding.
+
+        Higher number means higher movement cost. 0 is non-walkable.
+    """
 
     def __init__(self, map_data, diagonal_movement=False):
         self.open_list = []
@@ -178,37 +181,3 @@ class Grid():
 
         # Found no path
         return
-
-
-# test_node = Node((1, 1))
-# test_node.h_score = 5
-# test_node.g_score = 1
-# test_node2 = Node((1, 2))
-# test_node3 = Node((1, 3))
-# test_node3.h_score = 3
-# test_nodes = []
-# test_data = [[0, 0, 0, 0, 0], [0, 1, 1, 1, 0], [0, 1, 1, 1, 0], [
-#     0, 1, 1, 1, 0], [0, 0, 0, 0, 0]]
-# test_grid = Grid(test_data)
-
-# for line in test_grid.map_data:
-#     print(line)
-# print()
-
-# diags = test_grid.get_walkable_adjacent_nodes(Node((1, 3)), diagonals=True)
-# for diag in diags:
-#     print(diag)
-
-# test_grid.open_list.append(Node((2, 1)))
-# test_grid.find_path((1, 1), (3, 3))
-
-# test_nodes.append(test_node)
-# test_grid.open_list.append(test_node)
-# test_grid.open_list.append(test_node2)
-# test_grid.open_list.append(test_node3)
-# for node in test_grid.open_list:
-#     print(node)
-# print()
-# print('lowest f: ', test_grid.get_lowest_f_score())
-# test_grid.closed_list.append(test_node3)
-# print(test_grid.node_in_closed_list(Node((1, 3))))
