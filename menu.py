@@ -16,7 +16,7 @@ class MenuBar():
         pygame.font.init()
 
     def update(self):
-
+        """Draws self and children and keeps hover status updated"""
         self.check_hover()
         self.draw()
 
@@ -39,10 +39,8 @@ class MenuBar():
                     if child.is_active:
                         self.hover_child = child
                         child.hover = True
-                        found_hover = True
                     # If a menu has been clicked open but cursor is over another menu, open that one with a click
-                    # Has children, i.e. is a top menu
-                    if self.open_menu and self.open_menu != child and hasattr(child, 'children'):
+                    if self.open_menu and self.open_menu != child and type(child) is Menu:
                         child.get_clicked()
                     continue
             child.hover = False
@@ -76,12 +74,11 @@ class MenuBar():
 
     def close_menus(self):
         """Close the currently open menu"""
-        if self.open_menu:
-            self.open_menu.close()
-            self.open_menu = None
+        self.open_menu.close()
+        self.open_menu = None
 
     def get_child_size(self):
-        """Gets a size for top menus, 25% of own size or at least 64px"""
+        """Gets a size for top menus, width is 25% of own width or at least 64px"""
         width = max(int(self.size[0] / 4), 64)
         height = self.size[1]
 
@@ -92,18 +89,20 @@ class MenuBar():
         self.size = [new_width, self.size[1]]
         child_size = self.get_child_size()
 
+        # Find child with longest text
         longest_child = None
 
         for child in self.children:
             child.size = child_size
             if not longest_child or len(child.text) > len(longest_child.text):
                 longest_child = child
-
+        # Find biggest possible font
         font = longest_child.get_font()
 
+        # Reposition children and apply new font
         for index, child in enumerate(self.children):
 
-            if type(child) is TopMenu:
+            if type(child) is Menu:
                 child.pos[0] = self.pos[0] + (child.size[0] * index)
                 child.set_menu_text(font)
                 for grand_child in child.children:
@@ -114,8 +113,8 @@ class MenuBar():
     def add_menu(self, text='', command=None):
         """Creates a menu and sorts it horizontally with existing ones"""
         child_size = self.get_child_size()
-        menu = TopMenu(self, self.screen, (255, 178, 102),
-                       self.pos.copy(), child_size, text=text, highlight_color=(255, 204, 153), click_color=(255, 229, 204), command=command)
+        menu = Menu(self, self.screen, (255, 178, 102),
+                    self.pos.copy(), child_size, text=text, highlight_color=(255, 204, 153), click_color=(255, 229, 204), command=command)
 
         menu.pos[0] = self.pos[0] + len(self.children) * child_size[0]
 
@@ -123,8 +122,8 @@ class MenuBar():
         return menu
 
 
-class BaseMenu():
-    """Menu parent object with menu items as children"""
+class MenuObject():
+    """Base menu object"""
 
     def __init__(self, parent, screen, color, pos, size, text='', highlight_color=None, command=None):
         self.parent = parent
@@ -133,12 +132,11 @@ class BaseMenu():
         self.pos = pos
         self.size = size
         self.text = text
-        self.menu_text = None
+        self.menu_text = None  # text variable rendered with a font
         self.orig_color = color
         self.highlight_color = highlight_color if highlight_color != None else color
         self.command = command
         self.hover = False
-        self.is_active = True
 
     def draw(self):
         """Draws self"""
@@ -170,13 +168,13 @@ class BaseMenu():
         """Calls command"""
 
         if self.command:
-            if not callable(self.command):
+            if not callable(self.command):  # Command is a list of function and arguments
                 partial(self.command[0])(*self.command[1:])
             else:
                 partial(self.command)()
 
 
-class TopMenu(BaseMenu):
+class Menu(MenuObject):
 
     def __init__(self, parent, screen, color, pos, size, text='', highlight_color=None, click_color=None, command=None, selected=False):
         super().__init__(parent, screen, color, pos, size, text=text,
@@ -185,7 +183,7 @@ class TopMenu(BaseMenu):
         self.flash_duration = 30  # How many screen refreshes is the click color shown
         self.click_timer = self.flash_duration
         self.is_active = True
-        self.selected_child = None
+        self.selected_child = None  # Child that should be marked as selected under self
         self.children = []
 
     def draw(self):
@@ -232,8 +230,8 @@ class TopMenu(BaseMenu):
 
     def add_item(self, text='', command=None, selected=False):
         """Adds a menu item and sorts it vertically with others"""
-        item = ChildMenu(self, self.screen, self.color, self.pos.copy(),
-                         self.size, text=text, highlight_color=self.highlight_color, command=command, selected=selected)
+        item = MenuItem(self, self.screen, self.color, self.pos.copy(),
+                        self.size, text=text, highlight_color=self.highlight_color, command=command, selected=selected)
 
         item.pos[1] = self.pos[1] + (item.size[1] * (len(self.children) + 1))
         item.parent = self
@@ -243,7 +241,7 @@ class TopMenu(BaseMenu):
         return item
 
 
-class ChildMenu(BaseMenu):
+class MenuItem(MenuObject):
 
     def __init__(self, parent, screen, color, pos, size, text='', highlight_color=None, command=None, selected=False):
         super().__init__(parent, screen, color, pos, size, text=text,
